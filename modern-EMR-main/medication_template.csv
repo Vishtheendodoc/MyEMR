@@ -1,0 +1,286 @@
+generic_name,brand_name,drug_class,indication,manufacturer,strength,formulation,price
+Metformin,Glycomet,Biguanide,Type 2 Diabetes,USV Ltd,500mg,Tablet,12.50
+Metformin,Glucophage,Biguanide,Type 2 Diabetes,Abbott,500mg,Tablet,15.00
+Glimepiride,Amaryl,Sulfonylurea,Type 2 Diabetes,Sanofi,1mg,Tablet,25.00
+Glimepiride,Glimestar,Sulfonylurea,Type 2 Diabetes,Sun Pharma,1mg,Tablet,20.00
+Insulin Glargine,Lantus,Long-acting Insulin,Type 1 & 2 Diabetes,Sanofi,100 IU/ml,Injection,850.00
+Insulin Glargine,Basalog,Long-acting Insulin,Type 1 & 2 Diabetes,Biocon,100 IU/ml,Injection,650.00
+Levothyroxine,Eltroxin,Thyroid Hormone,Hypothyroidism,GSK,50mcg,Tablet,35.00
+Levothyroxine,Thyronorm,Thyroid Hormone,Hypothyroidism,Abbott,50mcg,Tablet,32.00
+Dapagliflozin + Sitagliptin + Metformin,Dapaturn SM,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,10/100/1000,Tablet,238.00
+Telmisartan + Cilnidipine,Telista CL,Antihypertensive Combination,Hypertension,Lupin Ltd,40/10 mg,Tablet,201.45
+Dapagliflozin + Glimepiride + Metformin,Udapa Gold 1,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,10/1/500,Tablet,250.00
+Dapagliflozin + Glimepiride + Metformin,Udapa Gold 2,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,10/2/500,Tablet,280.00
+Glimepiride + Metformin,Zoryl M1,Antidiabetic Combination,Type 2 Diabetes,Intas Pharma,1/500 mg,Tablet,95.00
+Glimepiride + Metformin,Zoryl M2,Antidiabetic Combination,Type 2 Diabetes,Intas Pharma,2/500 mg,Tablet,120.00
+Rosuvastatin,Rosumac 10,Statin,Hyperlipidemia,Macleods,10mg,Tablet,150.00
+Rosuvastatin + Fenofibrate,Novostat TG 10,Lipid-lowering Combination,Hyperlipidemia,Lupin Ltd,10/160 mg,Tablet,200.00
+Dapagliflozin + Sitagliptin + Metformin,Udapa Trio 500,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,10/100/500,Tablet,210.00
+Dapagliflozin + Sitagliptin + Metformin,Udapa Trio 1000,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,10/100/1000,Tablet,238.00
+Montelukast + Desloratadine,Mondeslor 10,Antiallergic Combination,Allergic Rhinitis,Sun Pharma,10/5 mg,Tablet,168.00
+Esomeprazole + Domperidone,Somprez D 40,GI Combination,GERD,Sun Pharma,40/30 mg,Capsule,166.50
+Cilnidipine + Telmisartan,Dilnip T 10,Antihypertensive Combination,Hypertension,Lupin Ltd,10/40 mg,Tablet,315.00
+Empagliflozin + Linagliptin,Linapride E,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharma,10/5 mg,Tablet,180.00
+Dapagliflozin + Linagliptin + Metformin,Linapride DM,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharma,10/5/1000,Tablet,280.00
+Dapagliflozin + Sitagliptin + Metformin,Oxramet S XR,Antidiabetic Combination,Type 2 Diabetes,MSN Labs,10/100/1000,Tablet,220.00
+Empagliflozin + Linagliptin,Liralin EP,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharma,25/5 mg,Tablet,200.00
+Empagliflozin,Xenia 25,SGLT2 Inhibitor,Type 2 Diabetes,USV Ltd,25mg,Tablet,163.90
+Empagliflozin + Metformin,Xenia M,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,12.5/500 mg,Tablet,140.00
+Fenofibrate + Rosuvastatin,Fenocor R 10,Lipid-lowering Combination,Hyperlipidemia,Intas Pharma,160/10 mg,Tablet,200.00
+Semaglutide,Semaneo,GLP-1 Agonist,Type 2 Diabetes / Weight Management,Intas Pharma,0.25mg,Injection,800.00
+Semaglutide,Semaneo,GLP-1 Agonist,Type 2 Diabetes / Weight Management,Intas Pharma,0.5mg,Injection,900.00
+Semaglutide,Semaneo,GLP-1 Agonist,Type 2 Diabetes / Weight Management,Intas Pharma,1mg,Injection,1000.00
+Semaglutide,Semaneo,GLP-1 Agonist,Type 2 Diabetes / Weight Management,Intas Pharma,1.7mg,Injection,1100.00
+Semaglutide,Semaneo,GLP-1 Agonist,Type 2 Diabetes / Weight Management,Intas Pharma,2.4mg,Injection,1199.00
+Semaglutide,Noveltreat,GLP-1 Agonist,Weight Management,Sun Pharma,0.25mg,Injection,1000.00
+Semaglutide,Noveltreat,GLP-1 Agonist,Weight Management,Sun Pharma,0.5mg,Injection,1100.00
+Semaglutide,Noveltreat,GLP-1 Agonist,Weight Management,Sun Pharma,1mg,Injection,1200.00
+Semaglutide,Noveltreat,GLP-1 Agonist,Weight Management,Sun Pharma,1.7mg,Injection,1600.00
+Semaglutide,Noveltreat,GLP-1 Agonist,Weight Management,Sun Pharma,2.4mg,Injection,2000.00
+Semaglutide,Sundae pen,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,0.25mg,Injection,1200.00
+Semaglutide,Sundae pen,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,0.5mg,Injection,1300.00
+Semaglutide,Sundae pen,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,1mg,Injection,1400.00
+Semaglutide,Sundae pen,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,1.7mg,Injection,1600.00
+Semaglutide,Sundae pen,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,2.4mg,Injection,1800.00
+Semaglutide,Sundae vial,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,0.25mg,Injection,1100.00
+Semaglutide,Sundae vial,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,0.5mg,Injection,1200.00
+Semaglutide,Sundae vial,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,1mg,Injection,1300.00
+Semaglutide,Sundae vial,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,1.7mg,Injection,1500.00
+Semaglutide,Sundae vial,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,2.4mg,Injection,1600.00
+Semaglutide,Obeda,GLP-1 Agonist,Type 2 Diabetes,Intas Pharma,0.25mg,Injection,1000.00
+Semaglutide,Obeda,GLP-1 Agonist,Type 2 Diabetes,Intas Pharma,0.5mg,Injection,1100.00
+Semaglutide,Obeda,GLP-1 Agonist,Type 2 Diabetes,Intas Pharma,1mg,Injection,1200.00
+Semaglutide,Obeda,GLP-1 Agonist,Type 2 Diabetes,Intas Pharma,1.7mg,Injection,1400.00
+Semaglutide,Obeda,GLP-1 Agonist,Type 2 Diabetes,Intas Pharma,2.4mg,Injection,1500.00
+Semaglutide,Semaglyn,GLP-1 Agonist,Type 2 Diabetes,Lupin Ltd,0.25mg,Injection,950.00
+Semaglutide,Semaglyn,GLP-1 Agonist,Type 2 Diabetes,Lupin Ltd,0.5mg,Injection,1050.00
+Semaglutide,Semaglyn,GLP-1 Agonist,Type 2 Diabetes,Lupin Ltd,1mg,Injection,1150.00
+Semaglutide,Semaglyn,GLP-1 Agonist,Type 2 Diabetes,Lupin Ltd,1.7mg,Injection,1300.00
+Semaglutide,Semaglyn,GLP-1 Agonist,Type 2 Diabetes,Lupin Ltd,2.4mg,Injection,1400.00
+Semaglutide,Sembolic,GLP-1 Agonist,Type 2 Diabetes,Torrent Pharma,0.25mg,Injection,900.00
+Semaglutide,Sembolic,GLP-1 Agonist,Type 2 Diabetes,Torrent Pharma,0.5mg,Injection,1000.00
+Semaglutide,Sembolic,GLP-1 Agonist,Type 2 Diabetes,Torrent Pharma,1mg,Injection,1100.00
+Semaglutide,Sembolic,GLP-1 Agonist,Type 2 Diabetes,Torrent Pharma,1.7mg,Injection,1250.00
+Semaglutide,Sembolic,GLP-1 Agonist,Type 2 Diabetes,Torrent Pharma,2.4mg,Injection,1350.00
+Semaglutide,Semanat vial,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,0.25mg,Injection,1050.00
+Semaglutide,Semanat vial,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,0.5mg,Injection,1150.00
+Semaglutide,Semanat vial,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,1mg,Injection,1250.00
+Semaglutide,Semanat vial,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,1.7mg,Injection,1400.00
+Semaglutide,Semanat vial,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,2.4mg,Injection,1550.00
+Semaglutide,Sematrinity,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,2mg,Injection,750.00
+Semaglutide,Sematrinity,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,4mg,Injection,1300.00
+Semaglutide,Ozempic,GLP-1 Agonist,Type 2 Diabetes,Novo Nordisk,0.25mg,Injection,3200.00
+Semaglutide,Ozempic,GLP-1 Agonist,Type 2 Diabetes,Novo Nordisk,0.5mg,Injection,3500.00
+Semaglutide,Ozempic,GLP-1 Agonist,Type 2 Diabetes,Novo Nordisk,1mg,Injection,4000.00
+Semaglutide,Ozempic,GLP-1 Agonist,Type 2 Diabetes,Novo Nordisk,2mg,Injection,4500.00
+Semaglutide,Wegovy,GLP-1 Agonist,Weight Management,Novo Nordisk,0.25mg,Injection,3500.00
+Semaglutide,Wegovy,GLP-1 Agonist,Weight Management,Novo Nordisk,0.5mg,Injection,3800.00
+Semaglutide,Wegovy,GLP-1 Agonist,Weight Management,Novo Nordisk,1mg,Injection,4200.00
+Semaglutide,Wegovy,GLP-1 Agonist,Weight Management,Novo Nordisk,1.7mg,Injection,4800.00
+Semaglutide,Wegovy,GLP-1 Agonist,Weight Management,Novo Nordisk,2.4mg,Injection,5500.00
+Cilnidipine + Telmisartan,Telplus 40,Antihypertensive Combination,Hypertension,Sun Pharma,10/40 mg,Tablet,200.00
+Domperidone + Rabeprazole,Veloz D,GI Combination,GERD,Torrent Pharma,30/20 mg,Capsule,150.00
+Pancreatin,Enzar HS,Digestive Enzyme,Pancreatic Insufficiency,Torrent Pharma,250mg,Capsule,180.00
+Nutritional Supplement,Prohance D,Nutritional Supplement,Diabetes Nutrition,Sun Pharma,200g,Powder,400.00
+Sitagliptin + Empagliflozin + Metformin,Istamet EMpa 25,Antidiabetic Combination,Type 2 Diabetes,MSD,25/100/1000,Tablet,350.00
+Dapagliflozin + Sitagliptin,Dapefy S,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/100,Tablet,220.00
+Dapagliflozin,Dapefy,SGLT2 Inhibitor,Type 2 Diabetes,Sun Pharma,10mg,Tablet,205.00
+Glimepiride + Metformin,Gemer 1,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,1/500 mg,Tablet,55.00
+Glimepiride + Metformin,Gemer 2,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,2/500 mg,Tablet,65.00
+Glimepiride + Metformin + Voglibose,Gemer V 1,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,1/500/0.2 mg,Tablet,130.00
+Glimepiride + Metformin + Voglibose,Gemer V 2,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,2/500/0.2 mg,Tablet,150.00
+Glimepiride + Metformin,Gluconorm G 1,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,1/500 mg,Tablet,90.00
+Glimepiride + Metformin,Gluconorm G 2,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,2/500 mg,Tablet,110.00
+Glimepiride + Metformin + Pioglitazone,Gluconorm PG 1,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,1/500/15 mg,Tablet,94.00
+Glimepiride + Metformin + Pioglitazone,Gluconorm PG 2,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,2/500/15 mg,Tablet,119.00
+Glimepiride + Metformin,Glycomet GP 1,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,1/500 mg,Tablet,59.00
+Glimepiride + Metformin,Glycomet GP 2,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,2/500 mg,Tablet,75.00
+Gabapentin + Lidocaine,Sentidor Gel,Neuropathic Pain Agent,Neuropathic Pain,Anthem Biopharma,6/5%,Gel,350.00
+Gabapentin + Lidocaine,Gabacure Gel,Neuropathic Pain Agent,Neuropathic Pain,HBC Lifesciences,6/5%,Gel,300.00
+Urea + Allantoin,FootSave Plus,Topical Emollient,Diabetic Foot Care,Anthem Biopharma,50g,Cream,155.00
+Empagliflozin,Empaneo,SGLT2 Inhibitor,Type 2 Diabetes,Intas Pharma,25mg,Tablet,200.00
+Empagliflozin + Sitagliptin + Metformin,Empaneo SM,Antidiabetic Combination,Type 2 Diabetes,Intas Pharma,25/100/1000,Tablet,350.00
+Empagliflozin + Linagliptin + Metformin,Linapride EM,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharma,25/5/1000,Tablet,350.00
+Dapagliflozin + Glimepiride + Metformin,GemerDapa XR 1,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/1/1000,Tablet,280.00
+Dapagliflozin + Glimepiride + Metformin,GemerDapa XR 2,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/2/1000,Tablet,300.00
+Dapagliflozin + Glimepiride + Metformin,Oxramet G XR 10/1/1000,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/1/1000,Tablet,105.00
+Dapagliflozin + Glimepiride + Metformin,Oxramet G XR 10/2/1000,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/2/1000,Tablet,119.00
+Dapagliflozin + Glimepiride + Metformin,Oxramet G XR 10/1/500,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/1/500,Tablet,101.50
+Dapagliflozin + Glimepiride + Metformin,Oxramet G XR 10/2/500,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/2/500,Tablet,112.00
+Human Insulin 30/70,Huminsulin 30/70,Short & Intermediate Insulin,Type 1 & 2 Diabetes,Eli Lilly,100 IU/ml,Injection,350.00
+Human Insulin 30/70,Xsulin 30/70,Short & Intermediate Insulin,Type 1 & 2 Diabetes,Glenmark,100 IU/ml,Injection,320.00
+Human Insulin 30/70,Lupisulin 30/70,Short & Intermediate Insulin,Type 1 & 2 Diabetes,Lupin Ltd,100 IU/ml,Injection,310.00
+Insulin Regular,Huminsulin R,Short-acting Insulin,Type 1 & 2 Diabetes,Eli Lilly,100 IU/ml,Injection,280.00
+Insulin NPH,Huminsulin N,Intermediate Insulin,Type 1 & 2 Diabetes,Eli Lilly,100 IU/ml,Injection,290.00
+Insulin Lispro,Humalog Mix 25,Rapid & Intermediate Insulin,Type 1 & 2 Diabetes,Eli Lilly,100 IU/ml,Injection,750.00
+Insulin Lispro,Humalog,Rapid-acting Insulin,Type 1 & 2 Diabetes,Eli Lilly,100 IU/ml,Injection,680.00
+Insulin Lispro,Lyumjev,Rapid-acting Insulin,Type 1 & 2 Diabetes,Eli Lilly,100 IU/ml,Injection,900.00
+Insulin Glargine,Xglar,Long-acting Insulin,Type 1 & 2 Diabetes,Lupin Ltd,100 IU/ml,Injection,700.00
+Insulin Glargine,Basaglar,Long-acting Insulin,Type 1 & 2 Diabetes,Biocon,100 IU/ml,Injection,720.00
+Insulin Glargine,Basalog One,Long-acting Insulin,Type 1 & 2 Diabetes,Biocon,100 IU/ml,Injection,680.00
+Insulin Glargine,Basugine,Long-acting Insulin,Type 1 & 2 Diabetes,Biocon,100 IU/ml,Injection,660.00
+Insulin Aspart,Fiasp,Rapid-acting Insulin,Type 1 & 2 Diabetes,Novo Nordisk,100 IU/ml,Injection,850.00
+Insulin Aspart,Novorapid,Rapid-acting Insulin,Type 1 & 2 Diabetes,Novo Nordisk,100 IU/ml,Injection,720.00
+Insulin Degludec,Tresiba,Ultra Long-acting Insulin,Type 1 & 2 Diabetes,Novo Nordisk,100 IU/ml,Injection,950.00
+Insulin Degludec + Aspart,Ryzodeg,Premixed Insulin,Type 1 & 2 Diabetes,Novo Nordisk,100 IU/ml,Injection,880.00
+Bisoprolol,Bisoreg,Beta Blocker,Hypertension / Heart Failure,Micro Labs,2.5mg,Tablet,45.00
+Rosuvastatin,Jupiros,Statin,Hyperlipidemia,Alkem,10mg,Tablet,120.00
+Rosuvastatin,Rosumac,Statin,Hyperlipidemia,Macleods,10mg,Tablet,150.00
+Rosuvastatin,Rozucor,Statin,Hyperlipidemia,Sun Pharma,10mg,Tablet,140.00
+Rosuvastatin + Fenofibrate,Roseloy F,Lipid-lowering Combination,Hyperlipidemia,Lupin Ltd,10/160 mg,Tablet,210.00
+Rosuvastatin + Ezetimibe,Roseday EZ,Lipid-lowering Combination,Hyperlipidemia,USV Ltd,10/10 mg,Tablet,180.00
+Rosuvastatin,Zyrova,Lipid-lowering Combination,Hyperlipidemia,Zydus Cadila,10mg,Tablet,195.00
+Bempedoic Acid + Ezetimibe,Bemezy,Lipid-lowering Combination,Hyperlipidemia,USV Ltd,180/10 mg,Tablet,175.00
+Sitagliptin,Alsita,DPP-4 Inhibitor,Type 2 Diabetes,Torrent Pharmaceuticals,100mg,Tablet,85.00
+Sitagliptin + Metformin,Sitamerge M,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,50/500 mg,Tablet,90.00
+Sitagliptin + Metformin,Sitamerge,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,50/500 mg,Tablet,88.00
+Sitagliptin + Metformin,Sitamerge D,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,100/500 mg,Tablet,110.00
+Sitagliptin + Metformin,Stalix M,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,50/500 mg,Tablet,92.00
+Dapagliflozin + Sitagliptin + Metformin,Sitaxa M,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,10/100/500 mg,Tablet,95.00
+Sitagliptin + Metformin,Sitara M,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,50/500 mg,Tablet,88.00
+Sitagliptin + Metformin,Sitared M,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,50/500 mg,Tablet,90.00
+Sitagliptin + Metformin,Sitared MD XR,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,50/1000 mg,Tablet,120.00
+Sitagliptin + Metformin,Verifica M,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,50/500 mg,Tablet,95.00
+Sitagliptin + Metformin,Sugaray M,Antidiabetic Combination,Type 2 Diabetes,Mankind Pharma,50/500 mg,Tablet,80.00
+Glimepiride + Sitagliptin + Metformin,Sugaray GM,Antidiabetic Combination,Type 2 Diabetes,Mankind Pharma,1/50/1000 mg,Tablet,85.00
+Glimepiride + Metformin,Metview G1,Antidiabetic Combination,Type 2 Diabetes,Micro Labs,1/500 mg,Tablet,70.00
+Dapagliflozin + Sitagliptin,Sitaxa E,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,10/100 mg,Tablet,220.00
+Dapagliflozin + Sitagliptin + Metformin,Sitaxa DM,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,10/100/1000 mg,Tablet,280.00
+Empagliflozin + Sitagliptin + Metformin,Sitaxa EM,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,25/100/1000 mg,Tablet,285.00
+Dapagliflozin + Sitagliptin,Sitaxa D,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,10/100 mg,Tablet,250.00
+Dapagliflozin + Sitagliptin + Metformin,Sitaxa M XR,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,10/100/1000 mg,Tablet,295.00
+Dapagliflozin + Sitagliptin,Oxra S,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/100 mg,Tablet,270.00
+Dapagliflozin + Sitagliptin + Metformin,Oxra S Met,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/100/1000 mg,Tablet,300.00
+Dapagliflozin + Sitagliptin + Metformin,Oxra L,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/100/1000 mg,Tablet,310.00
+Dapagliflozin,Oxra,SGLT2 Inhibitor,Type 2 Diabetes,Sun Pharma,10mg,Tablet,205.00
+Dapagliflozin,Dapaone,SGLT2 Inhibitor,Type 2 Diabetes,Micro Labs,10mg,Tablet,195.00
+Dapagliflozin + Sitagliptin + Metformin,Dapacose Trio,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,10/100/1000 mg,Tablet,275.00
+Dapagliflozin + Sitagliptin + Metformin,Dapanorm Trio,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,10/100/1000 mg,Tablet,270.00
+Dapagliflozin + Sitagliptin + Metformin,Dapahenz SM,Antidiabetic Combination,Type 2 Diabetes,La Renon Healthcare,10/100/1000 mg,Tablet,265.00
+Dapagliflozin + Sitagliptin + Metformin,Dapaturn,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,10/100/1000 mg,Tablet,238.00
+Dapagliflozin + Sitagliptin,Dapaturn S,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,10/100 mg,Tablet,220.00
+Dapagliflozin + Sitagliptin + Metformin,Dapaturn SM,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,10/100/1000 mg,Tablet,238.00
+Dapagliflozin + Glimepiride + Metformin,Dapaturn GM,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,10/2/1000 mg,Tablet,280.00
+Dapagliflozin + Glimepiride + Metformin,Dapaturn M,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,10/1/500 mg,Tablet,250.00
+Dapagliflozin + Sitagliptin,Dapavel S,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/100 mg,Tablet,225.00
+Dapagliflozin + Metformin,Zucapride M,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,10/500 mg,Tablet,180.00
+Dapagliflozin + Sitagliptin,Zucapride S,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,10/100 mg,Tablet,215.00
+Dapagliflozin + Sitagliptin + Metformin,Udapa S,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,10/100/500 mg,Tablet,210.00
+Dapagliflozin + Metformin,Udapa M,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,10/500 mg,Tablet,190.00
+Empagliflozin,Gibtulio 25,SGLT2 Inhibitor,Type 2 Diabetes,Lupin Ltd,25mg,Tablet,200.00
+Empagliflozin + Metformin,Gibtulio Met,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,12.5/500 mg,Tablet,175.00
+Empagliflozin + Sitagliptin,Gibtulio S,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,25/100 mg,Tablet,280.00
+Empagliflozin + Sitagliptin + Metformin,Gibtulio S 25/100/1000,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,25/100/1000 mg,Tablet,350.00
+Empagliflozin,Empadoz,SGLT2 Inhibitor,Type 2 Diabetes,Zydus Cadila,10mg,Tablet,195.00
+Empagliflozin + Linagliptin,Empadoz L,Antidiabetic Combination,Type 2 Diabetes,Zydus Cadila,10/5 mg,Tablet,210.00
+Empagliflozin + Linagliptin,Empanorm,Antidiabetic Combination,Type 2 Diabetes,Alkem Laboratories,10/5 mg,Tablet,205.00
+Empagliflozin + Linagliptin,Empanorm L,Antidiabetic Combination,Type 2 Diabetes,Alkem Laboratories,10/5 mg,Tablet,230.00
+Empagliflozin + Linagliptin,Empanorm L 25,Antidiabetic Combination,Type 2 Diabetes,Alkem Laboratories,25/5 mg,Tablet,235.00
+Empagliflozin + Linagliptin + Metformin,Empanorm LM,Antidiabetic Combination,Type 2 Diabetes,Alkem Laboratories,25/5/1000 mg,Tablet,340.00
+Empagliflozin + Linagliptin,Empapro L,Antidiabetic Combination,Type 2 Diabetes,Alkem Laboratories,25/5 mg,Tablet,225.00
+Empagliflozin,Empagreat 25,SGLT2 Inhibitor,Type 2 Diabetes,Lupin Ltd,25mg,Tablet,210.00
+Empagliflozin + Linagliptin,Xilingio,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,25/5 mg,Tablet,200.00
+Empagliflozin,Cospiaq,SGLT2 Inhibitor,Type 2 Diabetes,Lupin Ltd,10mg,Tablet,190.00
+Empagliflozin + Sitagliptin,EmpaCip S,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,25/100 mg,Tablet,290.00
+Empagliflozin + Sitagliptin + Metformin,EmpaCip S 25/100/1000,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,25/100/1000 mg,Tablet,360.00
+Empagliflozin + Sitagliptin,Empasov S,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,25/100 mg,Tablet,285.00
+Empagliflozin + Sitagliptin,Empaneo S,Antidiabetic Combination,Type 2 Diabetes,Intas Pharma,25/100 mg,Tablet,280.00
+Empagliflozin + Metformin,Empaglyn M,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,12.5/500 mg,Tablet,170.00
+Empagliflozin + Sitagliptin,Empaglyn S,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,25/100 mg,Tablet,275.00
+Empagliflozin + Linagliptin,Empaglyn L,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,25/5 mg,Tablet,220.00
+Empagliflozin + Metformin,Xenia M 12.5/500,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,12.5/500 mg,Tablet,140.00
+Linagliptin,Ondero,DPP-4 Inhibitor,Type 2 Diabetes,Boehringer Ingelheim,5mg,Tablet,120.00
+Linagliptin,Linatin,DPP-4 Inhibitor,Type 2 Diabetes,Lupin Ltd,5mg,Tablet,95.00
+Linagliptin + Dapagliflozin,Linatin D,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,5/10 mg,Tablet,200.00
+Empagliflozin + Linagliptin,Linabite E,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,25/5 mg,Tablet,215.00
+Empagliflozin + Linagliptin + Metformin,Linacip,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,25/5/1000 mg,Tablet,350.00
+Empagliflozin + Linagliptin,Linacip E,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,25/5 mg,Tablet,195.00
+Sitagliptin + Empagliflozin,Sitapride E,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,100/25 mg,Tablet,280.00
+Sitagliptin + Empagliflozin + Metformin,Istavel Empa,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,100/25/1000 mg,Tablet,360.00
+Sitagliptin + Empagliflozin + Metformin,Istamet D XR,Antidiabetic Combination,Type 2 Diabetes,MSD,100/25/1000 mg,Tablet,370.00
+Sitagliptin + Glimepiride + Metformin,Istamet G IR,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,50/2/500 mg,Tablet,340.00
+Dapagliflozin + Sitagliptin + Metformin,Stalix DM,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,10/100/1000 mg,Tablet,350.00
+Sitagliptin + Empagliflozin,Sitanorm E,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,100/25 mg,Tablet,275.00
+Gliclazide + Metformin,Glizique M 80,Antidiabetic Combination,Type 2 Diabetes,Franco-Indian Pharmaceuticals,80/500 mg,Tablet,75.00
+Gliclazide + Metformin,MV 80,Antidiabetic Combination,Type 2 Diabetes,Franco-Indian Pharmaceuticals,80/500 mg,Tablet,70.00
+Glimepiride + Metformin + Voglibose,Triglynase M,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,1/500/0.2 mg,Tablet,130.00
+Glimepiride + Metformin + Voglibose,Dynaglim MV,Antidiabetic Combination,Type 2 Diabetes,Micro Labs,1/500/0.2 mg,Tablet,125.00
+Vildagliptin + Metformin,Vildaray M,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,50/500 mg,Tablet,110.00
+Telmisartan,Zivartan,ARB,Hypertension,FDC Ltd,40mg,Tablet,65.00
+Telmisartan,Telsar,ARB,Hypertension,Torrent Pharma,40mg,Tablet,70.00
+Telmisartan,Tazloc,ARB,Hypertension,USV Ltd,40mg,Tablet,68.00
+Telmisartan + Metoprolol Succinate,Tazloc Beta,Antihypertensive Combination,Hypertension,USV Ltd,40/25 mg,Tablet,120.00
+Telmisartan + Amlodipine,Telmikind AM,Antihypertensive Combination,Hypertension,Mankind,40/5 mg,Tablet,95.00
+Telmisartan + Amlodipine + Hydrochlorothiazide,Telmikind AMH,Antihypertensive Combination,Hypertension,Mankind,40/5/12.5 mg,Tablet,110.00
+Telmisartan + Hydrochlorothiazide,Dynatel H,Antihypertensive Combination,Hypertension,Dynamark Life Sciences,40/12.5 mg,Tablet,85.00
+Telmisartan + Amlodipine,Telmiget AM,Antihypertensive Combination,Hypertension,Alkem,40/5 mg,Tablet,90.00
+Telmisartan + Hydrochlorothiazide,Telmiget H,Antihypertensive Combination,Hypertension,Alkem,40/12.5 mg,Tablet,88.00
+Telmisartan + Amlodipine,Telista AM,Antihypertensive Combination,Hypertension,Lupin Ltd,40/5 mg,Tablet,95.00
+Telmisartan + Amlodipine + Hydrochlorothiazide,Telista AMH,Antihypertensive Combination,Hypertension,Lupin Ltd,40/5/12.5 mg,Tablet,115.00
+Telmisartan + Hydrochlorothiazide,Telista H,Antihypertensive Combination,Hypertension,Lupin Ltd,40/12.5 mg,Tablet,90.00
+Telmisartan + Amlodipine,Telmikeen AM,Antihypertensive Combination,Hypertension,Mankind,40/5 mg,Tablet,88.00
+Cilnidipine,Cilnipress,Calcium Channel Blocker,Hypertension,Macleods,10mg,Tablet,55.00
+Cilnidipine + Telmisartan,Cilnipress T,Antihypertensive Combination,Hypertension,Macleods,10/40 mg,Tablet,120.00
+Cilnidipine + Telmisartan,Cildin T,Antihypertensive Combination,Hypertension,Macleods,10/40 mg,Tablet,118.00
+Cilnidipine + Telmisartan,Dilnip,Antihypertensive Combination,Hypertension,Lupin Ltd,10/40 mg,Tablet,315.00
+Cilnidipine + Telmisartan,Dilnip T,Antihypertensive Combination,Hypertension,Lupin Ltd,10/40 mg,Tablet,315.00
+Nebivolol + Telmisartan,Neulong T,Antihypertensive Combination,Hypertension,Macleods Pharmaceuticals,5/40 mg,Tablet,130.00
+Cilnidipine + Telmisartan,Nexovas T,Antihypertensive Combination,Hypertension,Macleods Pharmaceuticals,10/40 mg,Tablet,125.00
+Metoprolol + Telmisartan,Metocard T,Antihypertensive Combination,Hypertension,Torrent Pharmaceuticals,50/40 mg,Tablet,110.00
+Metoprolol Succinate,Prolomet XL,Beta Blocker,Hypertension / CAD,Sun Pharma,50mg,Tablet,45.00
+Telmisartan,Cortel 20,ARB,Hypertension,Corona Remedies,20mg,Tablet,45.00
+Telmisartan,Cortel 40,ARB,Hypertension,Corona Remedies,40mg,Tablet,60.00
+Telmisartan,Cortel 80,ARB,Hypertension,Corona Remedies,80mg,Tablet,95.00
+Telmisartan + Hydrochlorothiazide,Cortel H,Antihypertensive Combination,Hypertension,Corona Remedies,40/12.5 mg,Tablet,82.00
+Telmisartan + Hydrochlorothiazide,Cortel H 80,Antihypertensive Combination,Hypertension,Corona Remedies,80/12.5 mg,Tablet,105.00
+Telmisartan + Chlorthalidone,Cortel CH,Antihypertensive Combination,Hypertension,Corona Remedies,40/12.5 mg,Tablet,82.00
+Telmisartan + Chlorthalidone,Cortel CH 6.25,Antihypertensive Combination,Hypertension,Corona Remedies,40/6.25 mg,Tablet,78.00
+Telmisartan + Amlodipine,Cortel A,Antihypertensive Combination,Hypertension,Corona Remedies,40/5 mg,Tablet,95.00
+Telmisartan + Metoprolol Succinate,Cortel M,Antihypertensive Combination,Hypertension,Corona Remedies,40/25 mg,Tablet,100.00
+Telmisartan + Metoprolol Succinate,Cortel M 50,Antihypertensive Combination,Hypertension,Corona Remedies,40/50 mg,Tablet,110.00
+Telmisartan + Cilnidipine,Cortel LN,Antihypertensive Combination,Hypertension,Corona Remedies,40/10 mg,Tablet,115.00
+Telmisartan + Azelnidipine,Cortel AZ,Antihypertensive Combination,Hypertension,Corona Remedies,40/8 mg,Tablet,120.00
+Telmisartan + Cilnidipine + Chlorthalidone,Cortel 3D,Antihypertensive Combination,Hypertension,Corona Remedies,40/10/12.5 mg,Tablet,140.00
+Telmisartan + Cilnidipine + Metoprolol Succinate,Cortel LNB,Antihypertensive Combination,Hypertension,Corona Remedies,40/10/25 mg,Tablet,145.00
+Telmisartan + Amlodipine + Hydrochlorothiazide,Cortel Trio,Antihypertensive Combination,Hypertension,Corona Remedies,40/5/12.5 mg,Tablet,98.00
+Empagliflozin,Gluxit,SGLT2 Inhibitor,Type 2 Diabetes,Glenmark,10mg,Tablet,185.00
+Empagliflozin,Gluxit 10,SGLT2 Inhibitor,Type 2 Diabetes,Glenmark,10mg,Tablet,185.00
+Empagliflozin,Gluxit 25,SGLT2 Inhibitor,Type 2 Diabetes,Glenmark,25mg,Tablet,195.00
+Empagliflozin + Metformin,Gluxit M,Antidiabetic Combination,Type 2 Diabetes,Glenmark,12.5/500 mg,Tablet,165.00
+Levothyroxine,Euthyrox,Thyroid Hormone,Hypothyroidism,Merck,100mcg,Tablet,45.00
+Levothyroxine,Trela,Thyroid Hormone,Hypothyroidism,Abbott,100mcg,Tablet,42.00
+Pregabalin + Methylcobalamin,Pregalift NT,Neuropathic Pain Agent,Neuropathic Pain,Mankind,75/1500 mcg,Tablet,180.00
+Pregabalin + Nortriptyline,Rexite Plus,Neuropathic Pain Agent,Neuropathic Pain,Sun Pharma,75/10 mg,Tablet,165.00
+Gabapentin + Methylcobalamin + Nortriptyline,Gabaloy NT,Neuropathic Pain Agent,Neuropathic Pain,Alkem,300/1500/10 mg,Tablet,195.00
+Gabapentin + Methylcobalamin + Nortriptyline,Gabagesic NT,Neuropathic Pain Agent,Neuropathic Pain,Alkem,300/1500/10 mg,Tablet,195.00
+Gabapentin,Gabagesic Gel,Neuropathic Pain Agent,Neuropathic Pain,Alkem Laboratories,6%,Gel,320.00
+Gabapentin + Methylcobalamin,Gabagesic M,Neuropathic Pain Agent,Neuropathic Pain,Alkem,300/1500 mcg,Tablet,175.00
+Gabapentin + Methylcobalamin,Gabagesic M 300,Neuropathic Pain Agent,Neuropathic Pain,Alkem,300/1500 mcg,Tablet,175.00
+Gabapentin + Methylcobalamin,Gabagesic M 500,Neuropathic Pain Agent,Neuropathic Pain,Alkem,500/1500 mcg,Tablet,195.00
+Cholecalciferol,UPRISE D3,Vitamin D Supplement,Vitamin D Deficiency,Alkem,60000 IU,Capsule,35.00
+Lobeglitazone,Lobula,Thiazolidinedione,Type 2 Diabetes,Lupin Ltd,0.5mg,Tablet,1100.00
+Dapagliflozin + Glimepiride + Metformin,Udapa Gold 1,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,10/1/500 mg,Tablet,250.00
+Dapagliflozin + Glimepiride + Metformin,Udapa Gold 2,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,10/2/500 mg,Tablet,280.00
+Sitagliptin + Pioglitazone + Metformin,Alsita MP 1000,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,100/15/1000 mg,Tablet,145.00
+Empagliflozin + Sitagliptin + Metformin,Alsita EM 10,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,10/100/1000 mg,Tablet,320.00
+Empagliflozin + Sitagliptin + Metformin,Alsita EM 25,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,25/100/1000 mg,Tablet,350.00
+Dapagliflozin + Sitagliptin + Metformin,Sitaxa DM 500,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,10/100/500 mg,Tablet,250.00
+Glimepiride + Sitagliptin + Metformin,Sugaray GM 500,Antidiabetic Combination,Type 2 Diabetes,Mankind Pharma,1/50/500 mg,Tablet,95.00
+Dapagliflozin + Sitagliptin,Sitaxa D,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,5/50 mg,Tablet,180.00
+Empagliflozin + Linagliptin,Xilingio,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,10/5 mg,Tablet,185.00
+Dapagliflozin + Sitagliptin + Metformin,Dapahenz SM 500,Antidiabetic Combination,Type 2 Diabetes,La Renon Healthcare,10/100/500 mg,Tablet,250.00
+Telmisartan + Hydrochlorothiazide,Zivartan H,Antihypertensive Combination,Hypertension,FDC Ltd,40/12.5 mg,Tablet,75.00
+Sitagliptin + Metformin,Sitamerge M 100,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,100/500 mg,Tablet,115.00
+Sitagliptin + Metformin,Sitamerge D 100/10,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,100/1000 mg,Tablet,125.00
+Telmisartan + Amlodipine + Chlorthalidone,Neurokind LC,Antihypertensive Combination,Hypertension,Mankind,40/5/6.25 mg,Tablet,105.00
+Metoprolol Tartrate + Telmisartan,Metocard T 40,Antihypertensive Combination,Hypertension,Torrent Pharmaceuticals,50/40 mg,Tablet,110.00
+Metoprolol Tartrate + Telmisartan,Metocard T 50,Antihypertensive Combination,Hypertension,Torrent Pharmaceuticals,50/50 mg,Tablet,115.00
+Empagliflozin + Sitagliptin,Gluxit S,Antidiabetic Combination,Type 2 Diabetes,Glenmark,10/100 mg,Tablet,270.00
+Empagliflozin + Linagliptin,Gluxit L,Antidiabetic Combination,Type 2 Diabetes,Glenmark,10/5 mg,Tablet,200.00
+Empagliflozin + Sitagliptin + Metformin,Gluxit Trio,Antidiabetic Combination,Type 2 Diabetes,Glenmark,10/100/1000 mg,Tablet,320.00
+Sitagliptin + Dapagliflozin,Sitamerge D 100/500,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,100/10 mg,Tablet,110.00
+Metoprolol Succinate + Telmisartan,Met XL T 50,Antihypertensive Combination,Hypertension,Micro Labs,50/40 mg,Tablet,100.00
+Empagliflozin + Linagliptin,Ajaduo 10,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,10/5 mg,Tablet,200.00
+Empagliflozin + Linagliptin,Ajaduo 25,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,25/5 mg,Tablet,220.00
+Empagliflozin + Linagliptin + Metformin,Ajaduo M Forte,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,25/5/1000 mg,Tablet,280.00
+Sitagliptin + Pioglitazone + Metformin,Alsita MP,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharmaceuticals,100/15/500 mg,Tablet,120.00

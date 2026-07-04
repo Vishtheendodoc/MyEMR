@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Diagnoses - Endocrinology EMR{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="fas fa-diagnoses"></i> Diagnosis Master List</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('upload_diagnoses') }}" class="btn btn-primary">
+            <i class="fas fa-upload"></i> Upload Diagnoses
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Available Diagnoses</h5>
+    </div>
+    <div class="card-body">
+        {% if diagnoses %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Diagnosis Name</th>
+                        <th>Category</th>
+                        <th>ICD Code</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for diagnosis in diagnoses %}
+                    <tr>
+                        <td><strong>{{ diagnosis.diagnosis_name }}</strong></td>
+                        <td>
+                            {% if diagnosis.category %}
+                            <span class="badge bg-info">{{ diagnosis.category }}</span>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>{{ diagnosis.icd_code if diagnosis.icd_code else '-' }}</td>
+                        <td>{{ diagnosis.description[:100] if diagnosis.description else '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-file-medical fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No diagnoses in database. Upload a diagnosis list to get started!</p>
+            <a href="{{ url_for('upload_diagnoses') }}" class="btn btn-primary">Upload Diagnoses</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="alert alert-info mt-4">
+    <h5 class="alert-heading"><i class="fas fa-info-circle"></i> Note</h5>
+    <p class="mb-0">The diagnosis list is optional. Doctors can always type diagnoses directly in the visit form. This list is mainly for standardization and quick reference.</p>
+</div>
+{% endblock %}

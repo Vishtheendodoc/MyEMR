@@ -1,0 +1,10 @@
+flask
+flask-sqlalchemy
+flask-login
+flask-wtf
+email-validator
+flask-bcrypt
+weasyprint
+pandas
+openpyxl
+gunicorn==21.2.0

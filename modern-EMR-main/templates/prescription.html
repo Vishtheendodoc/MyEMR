@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Prescription - {{ patient.name }}</title>
+    {% set fs = font_size|default(12)|int %}
+    {% set fs_small = [fs - 2, 9]|max %}
+    {% set lh = line_height|default(1.12) %}
+    <style>
+        @page {
+            size: A4;
+            margin: 12mm 12mm 16mm 12mm;
+
+            @bottom-center {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: {{ fs_small }}pt;
+                color: #666;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            color: #333;
+            font-size: {{ fs }}pt;
+            line-height: {{ lh }};
+        }
+
+        body.preview-mode {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 16px;
+            background: #fff;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 4px;
+            margin-top: {{ header_space|default(0) }}mm;
+            margin-bottom: 6px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            margin: 0;
+            font-size: {{ fs }}pt;
+            font-weight: bold;
+            letter-spacing: 0.3px;
+            line-height: 1.1;
+        }
+
+        .header p {
+            margin: 1px 0;
+            font-size: {{ fs }}pt;
+            line-height: 1.1;
+        }
+
+        .section {
+            margin-bottom: 6px;
+            page-break-inside: avoid;
+        }
+
+        .section h3 {
+            margin: 0 0 2px 0;
+            font-size: {{ fs }}pt;
+            font-weight: bold;
+            color: #444;
+            line-height: 1.1;
+        }
+
+        .patient-info,
+        .info-box {
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 3px;
+        }
+
+        .patient-info table,
+        .vitals-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .patient-info td,
+        .vitals-table td {
+            padding: 1px 4px;
+            vertical-align: top;
+            font-size: {{ fs }}pt;
+            line-height: {{ lh }};
+        }
+
+        .diagnosis,
+        .complaints,
+        .comorbidities,
+        .investigations,
+        .follow-up {
+            padding: 4px 8px;
+        }
+
+        .diagnosis {
+            background: #e7f3ff;
+            border-left: 3px solid #2196F3;
+        }
+
+        .complaints {
+            background: #fff8e1;
+            border-left: 3px solid #ffc107;
+        }
+
+        .comorbidities {
+            background: #ffe0e0;
+            border-left: 3px solid #f44336;
+        }
+
+        .investigations {
+            background: #e3f2fd;
+            border-left: 3px solid #2196F3;
+        }
+
+        .follow-up {
+            background: #e7f3ff;
+            border-left: 3px solid #2196F3;
+        }
+
+        .section p {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: {{ fs }}pt;
+            line-height: {{ lh }};
+        }
+
+        .prescriptions table {
+            width: 100%;
+            border-collapse: collapse;
+            page-break-inside: auto;
+        }
+
+        .prescriptions th {
+            background: #667eea;
+            color: white;
+            padding: 3px 4px;
+            text-align: left;
+            font-size: {{ fs }}pt;
+            font-weight: bold;
+            line-height: 1.1;
+        }
+
+        .prescriptions td {
+            padding: 3px 4px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+            font-size: {{ fs }}pt;
+            line-height: {{ lh }};
+        }
+
+        .prescriptions tr {
+            page-break-inside: avoid;
+        }
+
+        .prescriptions small {
+            font-size: {{ fs }}pt;
+        }
+
+        .rx-note td {
+            background: #f8f9fa;
+            font-size: {{ fs }}pt;
+            padding: 2px 4px;
+            line-height: {{ lh }};
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 2px 4px;
+            margin: 0;
+            border-radius: 2px;
+            font-size: {{ fs }}pt;
+            line-height: {{ lh }};
+        }
+
+        .doctor-footer {
+            margin-top: 28mm;
+            text-align: right;
+            page-break-inside: avoid;
+        }
+
+        .doctor-footer p {
+            margin: 1px 0;
+            font-size: {{ fs }}pt;
+            line-height: 1.1;
+        }
+
+        .page-meta {
+            display: none;
+        }
+
+        body.preview-mode .page-meta {
+            display: block;
+            text-align: right;
+            font-size: {{ fs }}pt;
+            color: #666;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body{% if preview %} class="preview-mode"{% endif %}>
+    {% if preview and visit.pdf_page_count %}
+    <div class="page-meta">Saved PDF uses {{ visit.pdf_page_count }} page{{ 's' if visit.pdf_page_count != 1 else '' }}</div>
+    {% endif %}
+
+    <div class="header">
+        <h1>MEDICAL PRESCRIPTION</h1>
+        <p><strong>Endocrinology Department</strong></p>
+        <p>Date: {{ visit.visit_date.strftime('%d %B, %Y') }}</p>
+    </div>
+
+    <div class="section patient-info">
+        <h3>Patient Information</h3>
+        <table>
+            <tr>
+                <td width="22%"><strong>Name:</strong></td>
+                <td width="28%">{{ patient.name }}</td>
+                <td width="22%"><strong>Age:</strong></td>
+                <td width="28%">{{ patient.age }} years</td>
+            </tr>
+            <tr>
+                <td><strong>Sex:</strong></td>
+                <td>{{ patient.sex }}</td>
+                <td><strong>MRD:</strong></td>
+                <td>{{ patient.mrd_number or patient.id }}</td>
+            </tr>
+            {% if patient.contact %}
+            <tr>
+                <td><strong>Contact:</strong></td>
+                <td colspan="3">{{ patient.contact }}</td>
+            </tr>
+            {% endif %}
+            {% if patient.address %}
+            <tr>
+                <td><strong>Address:</strong></td>
+                <td colspan="3">{{ patient.address }}</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
+    {% if visit.diagnosis %}
+    <div class="section diagnosis">
+        <h3>Diagnosis</h3>
+        <p>{{ visit.diagnosis }}</p>
+    </div>
+    {% endif %}
+
+    {% if visit.height or visit.weight or visit.bmi or visit.bp_systolic or visit.pulse or visit.temperature or visit.spo2 %}
+    <div class="section info-box">
+        <h3>Vitals</h3>
+        <table class="vitals-table">
+            <tr>
+                {% if visit.height %}<td><strong>Height:</strong> {{ visit.height }} cm</td>{% endif %}
+                {% if visit.weight %}<td><strong>Weight:</strong> {{ visit.weight }} kg</td>{% endif %}
+                {% if visit.bmi %}<td><strong>BMI:</strong> {{ visit.bmi }}</td>{% endif %}
+                {% if visit.bp_systolic and visit.bp_diastolic %}<td><strong>BP:</strong> {{ visit.bp_systolic }}/{{ visit.bp_diastolic }}</td>{% endif %}
+            </tr>
+            <tr>
+                {% if visit.pulse %}<td><strong>Pulse:</strong> {{ visit.pulse }} bpm</td>{% endif %}
+                {% if visit.temperature %}<td><strong>Temp:</strong> {{ visit.temperature }}°F</td>{% endif %}
+                {% if visit.spo2 %}<td><strong>SpO2:</strong> {{ visit.spo2 }}%</td>{% endif %}
+            </tr>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if visit.chief_complaints %}
+    <div class="section complaints">
+        <h3>Chief Complaints</h3>
+        <p>{{ visit.chief_complaints }}</p>
+    </div>
+    {% endif %}
+
+    {% if visit.comorbidities %}
+    <div class="section comorbidities">
+        <h3>Comorbidities</h3>
+        <p>{{ visit.comorbidities }}</p>
+    </div>
+    {% endif %}
+
+    {% if visit.examination %}
+    <div class="section info-box">
+        <h3>Examination</h3>
+        <p>{{ visit.examination }}</p>
+    </div>
+    {% endif %}
+
+    {% if visit.investigation %}
+    <div class="section investigations">
+        <h3>Investigations</h3>
+        <p>{{ visit.investigation }}</p>
+    </div>
+    {% endif %}
+
+    <div class="section prescriptions">
+        <h3>Prescribed Medications</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:6%">#</th>
+                    <th style="width:34%">Medication</th>
+                    <th style="width:14%">Dosage</th>
+                    <th style="width:14%">Frequency</th>
+                    <th style="width:16%">Timing</th>
+                    <th style="width:16%">Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if prescriptions %}
+                    {% for prescription in prescriptions %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <strong>{{ format_prescription_drug_name(prescription) }}</strong>
+                            <small>({{ format_prescription_generic_name(prescription) }})</small>
+                        </td>
+                        <td>{{ format_prescription_dosage(prescription) }}</td>
+                        <td>{{ prescription.frequency }}</td>
+                        <td>{{ prescription.timing or '-' }}</td>
+                        <td>{{ prescription.duration }}</td>
+                    </tr>
+                    {% if prescription.instructions %}
+                    <tr class="rx-note">
+                        <td colspan="6"><em>Instructions: {{ prescription.instructions }}</em></td>
+                    </tr>
+                    {% endif %}
+                    {% if prescription.warnings %}
+                    <tr class="rx-note">
+                        <td colspan="6">
+                            <div class="warning"><strong>Warning:</strong> {{ prescription.warnings }}</div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6">No medications prescribed</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if visit.follow_up_date or visit.follow_up_notes %}
+    <div class="section follow-up">
+        <h3>Follow-up</h3>
+        {% if visit.follow_up_date %}
+        <p><strong>Next Visit:</strong> {{ visit.follow_up_date.strftime('%d %B, %Y') }}</p>
+        {% endif %}
+        {% if visit.follow_up_notes %}
+        <p><strong>Notes:</strong> {{ visit.follow_up_notes }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="doctor-footer">
+        <p><strong>Dr. {{ doctor.doctor_name }}</strong></p>
+        {% if doctor.qualifications %}<p>{{ doctor.qualifications }}</p>{% endif %}
+        {% if doctor.kmc_number %}<p>KMC Reg. No: {{ doctor.kmc_number }}</p>{% endif %}
+        <p>Endocrinologist</p>
+    </div>
+</body>
+</html>

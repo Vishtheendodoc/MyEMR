@@ -1,0 +1,37 @@
+.sidebar {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s;
+}
+.nav-link:hover, .nav-link.active {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+}
+.card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.auth-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.warning-badge {
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.search-results {
+  position: absolute;
+  z-index: 1000;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+}

@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}Visit - {{ visit.patient.name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-8">
+        <h2><i class="fas fa-file-medical"></i> Visit Details</h2>
+        <p class="text-muted">
+            <strong>Patient:</strong> {{ visit.patient.name }} 
+            {% if visit.patient.mrd_number %}(MRD: {{ visit.patient.mrd_number }}){% endif %}
+            | <strong>Date:</strong> {{ visit.visit_date.strftime('%Y-%m-%d %H:%M') }}
+            | <span class="badge bg-primary">{{ visit.visit_type }}</span>
+        </p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('patient_detail', patient_id=visit.patient_id) }}" class="btn btn-secondary">
+            <i class="fas fa-user"></i> Patient Profile
+        </a>
+        <a href="{{ url_for('add_prescription', visit_id=visit.id) }}" class="btn btn-success">
+            <i class="fas fa-prescription"></i> Prescribe
+        </a>
+        <a href="{{ url_for('preview_prescription', visit_id=visit.id) }}" class="btn btn-info">
+            <i class="fas fa-eye"></i> Preview PDF
+        </a>
+        <a href="{{ url_for('print_prescription', visit_id=visit.id) }}" class="btn btn-warning" target="_blank">
+            <i class="fas fa-print"></i> Print
+        </a>
+        <a href="{{ url_for('generate_pdf', visit_id=visit.id) }}" class="btn btn-outline-info">
+            <i class="fas fa-download"></i> Download
+        </a>
+        {% if visit.pdf_page_count %}
+        <span class="badge bg-secondary align-self-center ms-1">{{ visit.pdf_page_count }} page{{ 's' if visit.pdf_page_count != 1 else '' }}</span>
+        {% endif %}
+    </div>
+</div>
+
+{% if warnings %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <h5 class="alert-heading"><i class="fas fa-exclamation-triangle warning-badge"></i> Drug-Comorbidity Warnings</h5>
+    <ul class="mb-0">
+        {% for warning in warnings %}
+        <li>
+            <strong>{{ warning.drug }}</strong> with <strong>{{ warning.comorbidity }}</strong>: 
+            {{ warning.recommendation }}
+            <span class="badge bg-{{ 'danger' if warning.severity == 'high' else 'warning' }}">{{ warning.severity }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endif %}
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-comment-medical"></i> Chief Complaints</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0" style="font-size: 1.1em;"><strong>{{ visit.chief_complaints }}</strong></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-heartbeat"></i> Vitals</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless mb-0">
+                    {% if visit.height or visit.weight %}
+                    <tr>
+                        <td width="50%">
+                            {% if visit.height %}
+                            <strong>Height:</strong> {{ visit.height }} cm<br>
+                            {% endif %}
+                            {% if visit.weight %}
+                            <strong>Weight:</strong> {{ visit.weight }} kg<br>
+                            {% endif %}
+                            {% if visit.bmi %}
+                            <strong>BMI:</strong> {{ visit.bmi }}
+                            {% if visit.bmi < 18.5 %}
+                            <span class="badge bg-info">Underweight</span>
+                            {% elif visit.bmi < 25 %}
+                            <span class="badge bg-success">Normal</span>
+                            {% elif visit.bmi < 30 %}
+                            <span class="badge bg-warning">Overweight</span>
+                            {% else %}
+                            <span class="badge bg-danger">Obese</span>
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if visit.bp_systolic and visit.bp_diastolic %}
+                            <strong>BP:</strong> {{ visit.bp_systolic }}/{{ visit.bp_diastolic }} mmHg<br>
+                            {% endif %}
+                            {% if visit.pulse %}
+                            <strong>Pulse:</strong> {{ visit.pulse }} bpm<br>
+                            {% endif %}
+                            {% if visit.temperature %}
+                            <strong>Temp:</strong> {{ visit.temperature }} °F<br>
+                            {% endif %}
+                            {% if visit.spo2 %}
+                            <strong>SpO2:</strong> {{ visit.spo2 }}%
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="2" class="text-muted">No vitals recorded</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-diagnoses"></i> Diagnosis</h5>
+            </div>
+            <div class="card-body">
+                <h5>{{ visit.diagnosis if visit.diagnosis else 'No diagnosis recorded' }}</h5>
+                {% if visit.follow_up_date %}
+                <hr>
+                <p class="mb-0">
+                    <strong>Follow-up:</strong> <span class="badge bg-info">{{ visit.follow_up_date.strftime('%Y-%m-%d') }}</span>
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-history"></i> History</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ visit.history if visit.history else 'No history recorded' }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-stethoscope"></i> Examination</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ visit.examination if visit.examination else 'No examination findings recorded' }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if visit.investigation %}
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-flask"></i> Investigations Ordered</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ visit.investigation }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-prescription-bottle-alt"></i> Prescriptions</h5>
+                <a href="{{ url_for('add_prescription', visit_id=visit.id) }}" class="btn btn-sm btn-light">
+                    <i class="fas fa-plus"></i> Add Prescription
+                </a>
+            </div>
+            <div class="card-body">
+                {% if prescriptions %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Brand Name</th>
+                                <th>Generic Name</th>
+                                <th>Dosage</th>
+                                <th>Frequency</th>
+                                <th>Timing</th>
+                                <th>Duration</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prescription in prescriptions %}
+                            <tr>
+                                <td><strong>{{ format_prescription_drug_name(prescription) }}</strong></td>
+                                <td>{{ format_prescription_generic_name(prescription) }}</td>
+                                <td>{{ format_prescription_dosage(prescription) }}</td>
+                                <td>{{ prescription.frequency }}</td>
+                                <td>{{ prescription.timing if prescription.timing else '-' }}</td>
+                                <td>{{ prescription.duration }}</td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('delete_prescription', prescription_id=prescription.id) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% if prescription.instructions %}
+                            <tr>
+                                <td colspan="7" class="bg-light">
+                                    <small><i class="fas fa-info-circle text-info"></i> <strong>Instructions:</strong> {{ prescription.instructions }}</small>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% if prescription.warnings %}
+                            <tr>
+                                <td colspan="7">
+                                    <div class="alert alert-warning mb-0 py-2">
+                                        <small><i class="fas fa-exclamation-triangle"></i> {{ prescription.warnings }}</small>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-prescription fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No prescriptions for this visit</p>
+                    <a href="{{ url_for('add_prescription', visit_id=visit.id) }}" class="btn btn-primary">Add Prescription</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

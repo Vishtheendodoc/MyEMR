@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - Endocrinology EMR{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="fas fa-user-circle"></i> My Profile</h3>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> <strong>Note:</strong> Your qualifications and KMC number will appear on all prescription PDFs you generate.
+                </div>
+                
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Email (login):</strong></label>
+                            <p class="form-control-plaintext">{{ current_user.email or current_user.username }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Role:</strong></label>
+                            <p class="form-control-plaintext">{{ current_user.role|title }}</p>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h5 class="mb-3"><i class="fas fa-edit"></i> Update Professional Details</h5>
+
+                    <div class="mb-3">
+                        {{ form.display_name.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user-md"></i></span>
+                            {{ form.display_name(class="form-control", placeholder="Your name as shown on prescriptions") }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.qualifications.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-graduation-cap"></i></span>
+                            {{ form.qualifications(class="form-control", placeholder="e.g., MBBS, MD (Endocrinology), DNB") }}
+                        </div>
+                        <small class="form-text text-muted">Enter your complete medical qualifications</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.kmc_number.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                            {{ form.kmc_number(class="form-control", placeholder="e.g., KMC-12345") }}
+                        </div>
+                        <small class="form-text text-muted">Karnataka Medical Council registration number</small>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                    </div>
+                </form>
+                
+                <hr class="my-4">
+                
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6 class="mb-3"><i class="fas fa-file-pdf"></i> Preview: How it appears on prescriptions</h6>
+                        <div class="text-center p-3" style="border-top: 2px solid #333; display: inline-block;">
+                            <p class="mb-1"><strong>Dr. {{ current_user.doctor_name }}</strong></p>
+                            {% if current_user.qualifications %}
+                            <p class="mb-1">{{ current_user.qualifications }}</p>
+                            {% else %}
+                            <p class="mb-1 text-muted"><em>(Qualifications will appear here)</em></p>
+                            {% endif %}
+                            {% if current_user.kmc_number %}
+                            <p class="mb-1">KMC Reg. No: {{ current_user.kmc_number }}</p>
+                            {% else %}
+                            <p class="mb-1 text-muted"><em>(KMC number will appear here)</em></p>
+                            {% endif %}
+                            <p class="mb-0">Endocrinologist</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

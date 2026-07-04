@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: endocrinology-emr
+    env: python
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production

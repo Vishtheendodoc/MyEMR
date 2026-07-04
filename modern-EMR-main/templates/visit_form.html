@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - {{ patient.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .section-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-top: 20px;
+        margin-bottom: 15px;
+    }
+    .vitals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-12">
+        <h2><i class="fas fa-notes-medical"></i> {{ title }}</h2>
+        <p class="text-muted">
+            <strong>Patient:</strong> {{ patient.name }} ({{ patient.age }} yrs, {{ patient.sex }}) 
+            {% if patient.mrd_number %}| <strong>MRD:</strong> {{ patient.mrd_number }}{% endif %}
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" action="" id="visitForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <!-- Visit Type -->
+                    <div class="mb-3">
+                        {{ form.visit_type.label(class="form-label") }}
+                        {{ form.visit_type(class="form-control") }}
+                    </div>
+                    
+                    <!-- Chief Complaints -->
+                    <h5 class="section-header"><i class="fas fa-comment-medical"></i> Chief Complaints</h5>
+                    <div class="mb-3">
+                        {{ form.chief_complaints.label(class="form-label") }}
+                        {{ form.chief_complaints(class="form-control" + (' is-invalid' if form.chief_complaints.errors else ''), rows="3", placeholder="Patient's main complaints...") }}
+                        {% if form.chief_complaints.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.chief_complaints.errors %}<span>{{ error }}</span>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Vitals -->
+                    <h5 class="section-header"><i class="fas fa-heartbeat"></i> Vitals</h5>
+                    <div class="vitals-grid mb-3">
+                        <div>
+                            {{ form.height.label(class="form-label") }}
+                            {{ form.height(class="form-control", id="height", placeholder="cm") }}
+                        </div>
+                        <div>
+                            {{ form.weight.label(class="form-label") }}
+                            {{ form.weight(class="form-control", id="weight", placeholder="kg") }}
+                        </div>
+                        <div>
+                            <label class="form-label">BMI</label>
+                            <input type="text" class="form-control" id="bmi" readonly placeholder="Auto-calculated">
+                            <small class="text-muted" id="bmi-category"></small>
+                        </div>
+                        <div>
+                            {{ form.bp_systolic.label(class="form-label") }}
+                            {{ form.bp_systolic(class="form-control", placeholder="mmHg") }}
+                        </div>
+                        <div>
+                            {{ form.bp_diastolic.label(class="form-label") }}
+                            {{ form.bp_diastolic(class="form-control", placeholder="mmHg") }}
+                        </div>
+                        <div>
+                            {{ form.pulse.label(class="form-label") }}
+                            {{ form.pulse(class="form-control", placeholder="bpm") }}
+                        </div>
+                        <div>
+                            {{ form.temperature.label(class="form-label") }}
+                            {{ form.temperature(class="form-control", placeholder="°F") }}
+                        </div>
+                        <div>
+                            {{ form.spo2.label(class="form-label") }}
+                            {{ form.spo2(class="form-control", placeholder="%") }}
+                        </div>
+                    </div>
+                    
+                    <!-- Clinical Information -->
+                    <h5 class="section-header"><i class="fas fa-notes-medical"></i> Clinical Information</h5>
+                    
+                    <div class="mb-3">
+                        {{ form.history.label(class="form-label") }}
+                        {{ form.history(class="form-control", rows="3", placeholder="History of presenting illness, past medical history...") }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.examination.label(class="form-label") }}
+                        {{ form.examination(class="form-control", rows="4", placeholder="General examination, systemic examination findings...") }}
+                    </div>
+                    
+                    <h5 class="section-header"><i class="fas fa-stethoscope"></i> Diagnosis</h5>
+                    
+                    <div class="card mb-3" style="background: #f8f9fa;">
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-md-9">
+                                    <label class="form-label"><strong>Select from Diagnosis List</strong></label>
+                                    <select class="form-select" id="diagnosisDropdown">
+                                        <option value="">-- Select a diagnosis --</option>
+                                        {% for diagnosis in diagnoses %}
+                                        <option value="{{ diagnosis.diagnosis_name }}">{{ diagnosis.diagnosis_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button type="button" class="btn btn-primary w-100" id="addDiagnosisBtn">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <label class="form-label"><strong>Or Type Custom Diagnosis</strong></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="customDiagnosisInput" placeholder="Type custom diagnosis...">
+                                    <button type="button" class="btn btn-success" id="addCustomDiagnosisBtn">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="selectedDiagnosesList" style="display: none;">
+                                <hr>
+                                <label class="form-label"><strong>Selected Diagnoses:</strong></label>
+                                <div id="diagnosesContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {{ form.diagnosis_text(type="hidden", id="diagnosisTextHidden") }}
+                    
+                    <div class="mb-3">
+                        {{ form.comorbidities.label(class="form-label") }}
+                        {{ form.comorbidities(class="form-control", rows="2", placeholder="e.g., Hypertension, Chronic Kidney Disease") }}
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle"></i> Used for automatic drug-comorbidity checking. Separate with commas.
+                        </small>
+                    </div>
+                    
+                    <!-- Investigations & Follow-up -->
+                    <h5 class="section-header"><i class="fas fa-flask"></i> Investigations & Follow-up</h5>
+                    
+                    <div class="mb-3">
+                        {{ form.investigation.label(class="form-label") }}
+                        {{ form.investigation(class="form-control", rows="3", placeholder="Lab tests, imaging, procedures ordered...") }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.follow_up_date.label(class="form-label") }}
+                            {{ form.follow_up_date(class="form-control", type="date") }}
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            {{ form.follow_up_notes.label(class="form-label") }}
+                            {{ form.follow_up_notes(class="form-control", rows="2", placeholder="Instructions for follow-up visit...") }}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between mt-4">
+                        <a href="{{ url_for('patient_detail', patient_id=patient.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-calculate BMI
+function calculateBMI() {
+    const height = parseFloat($('#height').val());
+    const weight = parseFloat($('#weight').val());
+    
+    if (height && weight && height > 0) {
+        const heightM = height / 100;
+        const bmi = (weight / (heightM * heightM)).toFixed(2);
+        $('#bmi').val(bmi);
+        
+        // BMI categories
+        let category = '';
+        let color = '';
+        if (bmi < 18.5) {
+            category = 'Underweight';
+            color = 'text-info';
+        } else if (bmi < 25) {
+            category = 'Normal';
+            color = 'text-success';
+        } else if (bmi < 30) {
+            category = 'Overweight';
+            color = 'text-warning';
+        } else {
+            category = 'Obese';
+            color = 'text-danger';
+        }
+        $('#bmi-category').text(category).attr('class', 'text-muted ' + color);
+    } else {
+        $('#bmi').val('');
+        $('#bmi-category').text('');
+    }
+}
+
+$('#height, #weight').on('input', calculateBMI);
+
+// Calculate BMI on page load if values exist
+$(document).ready(function() {
+    calculateBMI();
+});
+
+// Diagnosis management
+let selectedDiagnoses = [];
+
+function updateDiagnosesDisplay() {
+    const container = $('#diagnosesContainer');
+    const hiddenField = $('#diagnosisTextHidden');
+    
+    if (selectedDiagnoses.length === 0) {
+        $('#selectedDiagnosesList').hide();
+        hiddenField.val('');
+        return;
+    }
+    
+    $('#selectedDiagnosesList').show();
+    
+    let html = '';
+    selectedDiagnoses.forEach((diagnosis, index) => {
+        html += `
+            <div class="alert alert-info d-flex justify-content-between align-items-center mb-2" role="alert">
+                <span><i class="fas fa-check-circle"></i> ${diagnosis}</span>
+                <button type="button" class="btn btn-sm btn-danger" onclick="removeDiagnosis(${index})">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+    });
+    
+    container.html(html);
+    hiddenField.val(selectedDiagnoses.join(', '));
+}
+
+function removeDiagnosis(index) {
+    selectedDiagnoses.splice(index, 1);
+    updateDiagnosesDisplay();
+}
+
+$('#addDiagnosisBtn').click(function() {
+    const dropdown = $('#diagnosisDropdown');
+    const selectedValue = dropdown.val();
+    
+    if (selectedValue && !selectedDiagnoses.includes(selectedValue)) {
+        selectedDiagnoses.push(selectedValue);
+        updateDiagnosesDisplay();
+        dropdown.val('');
+    } else if (selectedDiagnoses.includes(selectedValue)) {
+        alert('This diagnosis has already been added!');
+    }
+});
+
+$('#addCustomDiagnosisBtn').click(function() {
+    const input = $('#customDiagnosisInput');
+    const customValue = input.val().trim();
+    
+    if (customValue && !selectedDiagnoses.includes(customValue)) {
+        selectedDiagnoses.push(customValue);
+        updateDiagnosesDisplay();
+        input.val('');
+    } else if (selectedDiagnoses.includes(customValue)) {
+        alert('This diagnosis has already been added!');
+    }
+});
+
+// Allow Enter key to add custom diagnosis
+$('#customDiagnosisInput').keypress(function(e) {
+    if (e.which === 13) {
+        e.preventDefault();
+        $('#addCustomDiagnosisBtn').click();
+    }
+});
+
+</script>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Patients - Endocrinology EMR{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <h2><i class="fas fa-user-injured"></i> All Patients</h2>
+    </div>
+    <div class="col-md-8">
+        <form method="GET" action="{{ url_for('patients') }}" class="row g-2">
+            <div class="col-md-3">
+                <select name="search_type" class="form-select">
+                    <option value="name" {% if search_type == 'name' %}selected{% endif %}>Name</option>
+                    <option value="mrd" {% if search_type == 'mrd' %}selected{% endif %}>MRD/UHID</option>
+                    <option value="diagnosis" {% if search_type == 'diagnosis' %}selected{% endif %}>Diagnosis</option>
+                </select>
+            </div>
+            <div class="col-md-7">
+                <input type="text" name="search" class="form-control" placeholder="Search..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12 text-end">
+        <a href="{{ url_for('add_patient') }}" class="btn btn-success btn-lg">
+            <i class="fas fa-user-plus"></i> Register New Patient
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if patients %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>MRD/UHID</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Sex</th>
+                        <th>Contact</th>
+                        <th>Total Visits</th>
+                        <th>Registered</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for patient in patients %}
+                    <tr>
+                        <td>{{ patient.mrd_number if patient.mrd_number else '-' }}</td>
+                        <td><strong>{{ patient.name }}</strong></td>
+                        <td>{{ patient.age }}</td>
+                        <td>{{ patient.sex }}</td>
+                        <td>{{ patient.contact if patient.contact else '-' }}</td>
+                        <td><span class="badge bg-info">{{ patient.visits|length }}</span></td>
+                        <td>{{ patient.date_registered.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <a href="{{ url_for('patient_detail', patient_id=patient.id) }}" class="btn btn-sm btn-primary" title="View Profile">
+                                <i class="fas fa-user"></i>
+                            </a>
+                            <a href="{{ url_for('add_visit', patient_id=patient.id) }}" class="btn btn-sm btn-success" title="New Visit">
+                                <i class="fas fa-plus"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <p class="text-muted">{% if search_query %}No patients found matching "{{ search_query }}"{% else %}No patients registered yet{% endif %}</p>
+            <a href="{{ url_for('add_patient') }}" class="btn btn-primary">Register First Patient</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Prescription - {{ visit.patient.name }}</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: #525659;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .print-status {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            z-index: 10;
+        }
+        @media print {
+            .print-status { display: none; }
+            body { background: #fff; }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-status" id="printStatus">Loading prescription for print...</div>
+    <iframe id="pdfFrame" src="{{ pdf_url }}" title="Prescription PDF"></iframe>
+    <script>
+        const frame = document.getElementById('pdfFrame');
+        const status = document.getElementById('printStatus');
+
+        function triggerPrint() {
+            status.textContent = 'Opening print dialog...';
+            try {
+                frame.contentWindow.focus();
+                frame.contentWindow.print();
+            } catch (e) {
+                status.textContent = 'Print failed. Use Ctrl+P on this page.';
+            }
+        }
+
+        frame.addEventListener('load', function() {
+            status.textContent = 'Ready to print';
+            setTimeout(triggerPrint, 600);
+        });
+    </script>
+</body>
+</html>

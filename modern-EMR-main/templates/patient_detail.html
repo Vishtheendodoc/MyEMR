@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}{{ patient.name }} - Patient Profile{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-8">
+        <h2><i class="fas fa-user-circle"></i> {{ patient.name }}</h2>
+        <p class="text-muted">
+            {% if patient.mrd_number %}<strong>MRD:</strong> {{ patient.mrd_number }} | {% endif %}
+            <strong>Age:</strong> {{ patient.age }} | 
+            <strong>Sex:</strong> {{ patient.sex }}
+        </p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('edit_patient', patient_id=patient.id) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Edit Demographics
+        </a>
+        <a href="{{ url_for('add_visit', patient_id=patient.id) }}" class="btn btn-success btn-lg">
+            <i class="fas fa-plus"></i> New Visit
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-id-card"></i> Patient Information</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    {% if patient.contact %}
+                    <tr>
+                        <th width="40%">Contact:</th>
+                        <td>{{ patient.contact }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if patient.address %}
+                    <tr>
+                        <th>Address:</th>
+                        <td>{{ patient.address }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th>Registered:</th>
+                        <td>{{ patient.date_registered.strftime('%Y-%m-%d') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Total Visits:</th>
+                        <td><span class="badge bg-info">{{ visits|length }}</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card bg-light">
+            <div class="card-body text-center py-4">
+                <h1 class="display-4 mb-0">{{ visits|length }}</h1>
+                <p class="text-muted mb-3">Total Visits</p>
+                <a href="{{ url_for('add_visit', patient_id=patient.id) }}" class="btn btn-success btn-lg">
+                    <i class="fas fa-plus-circle"></i> Record New Visit
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Visit History</h5>
+            </div>
+            <div class="card-body">
+                {% if visits %}
+                {% for visit in visits %}
+                <div class="card mb-3 border-left-primary">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5>
+                                    <span class="badge bg-primary">{{ visit.visit_type }}</span>
+                                    {{ visit.visit_date.strftime('%B %d, %Y at %I:%M %p') }}
+                                </h5>
+                                <p class="mb-2"><strong>Chief Complaints:</strong> {{ visit.chief_complaints }}</p>
+                                {% if visit.diagnosis %}
+                                <p class="mb-2"><strong>Diagnosis:</strong> {{ visit.diagnosis }}</p>
+                                {% endif %}
+                                {% if visit.follow_up_date %}
+                                <p class="mb-0">
+                                    <strong>Follow-up:</strong> 
+                                    <span class="badge bg-info">{{ visit.follow_up_date.strftime('%Y-%m-%d') }}</span>
+                                </p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <a href="{{ url_for('visit_detail', visit_id=visit.id) }}" class="btn btn-primary mb-2">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                                <a href="{{ url_for('add_prescription', visit_id=visit.id) }}" class="btn btn-success mb-2">
+                                    <i class="fas fa-prescription"></i> Prescribe
+                                </a>
+                                <a href="{{ url_for('preview_prescription', visit_id=visit.id) }}" class="btn btn-info mb-2">
+                                    <i class="fas fa-eye"></i> Preview PDF
+                                </a>
+                                <a href="{{ url_for('print_prescription', visit_id=visit.id) }}" class="btn btn-warning mb-2" target="_blank">
+                                    <i class="fas fa-print"></i> Print
+                                </a>
+                                <a href="{{ url_for('generate_pdf', visit_id=visit.id) }}" class="btn btn-outline-info mb-2">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No visits recorded yet</p>
+                    <a href="{{ url_for('add_visit', patient_id=patient.id) }}" class="btn btn-primary btn-lg">Record First Visit</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

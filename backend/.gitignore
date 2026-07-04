@@ -1,0 +1,7 @@
+emr.db
+test_emr.db
+__pycache__/
+*.pyc
+.env
+static/prescriptions/
+uploads/

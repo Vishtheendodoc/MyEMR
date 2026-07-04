@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: emr
+      POSTGRES_PASSWORD: emr_secret
+      POSTGRES_DB: endo_emr
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U emr -d endo_emr"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://emr:emr_secret@db:5432/endo_emr
+      JWT_SECRET: change-me-in-production-use-long-random-string
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000
+      SEED_ON_STARTUP: "true"
+    volumes:
+      - ./backend:/app
+      - prescription_pdfs:/app/static/prescriptions
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:8000
+      VITE_PROXY_TARGET: http://backend:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  prescription_pdfs:
+  uploads:

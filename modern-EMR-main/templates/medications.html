@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Medications - Endocrinology EMR{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="fas fa-pills"></i> Medication Database</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('upload_medications') }}" class="btn btn-primary">
+            <i class="fas fa-upload"></i> Upload Medications
+        </a>
+    </div>
+</div>
+
+{% if prescription_stats %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center border-primary">
+            <div class="card-body py-3">
+                <div class="h3 mb-0 text-primary">{{ prescription_stats.total_prescriptions }}</div>
+                <small class="text-muted">Total Prescriptions Written</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body py-3">
+                <div class="h3 mb-0">{{ prescription_stats.total_listed }}</div>
+                <small class="text-muted">From Database List</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body py-3">
+                <div class="h3 mb-0">{{ prescription_stats.total_custom }}</div>
+                <small class="text-muted">Custom / Not in List</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body py-3">
+                <div class="h3 mb-0">{{ prescription_stats.brands_prescribed }}</div>
+                <small class="text-muted">Brands Used at Least Once</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Prescription Counts — Database Brands</h5>
+        <span class="badge bg-light text-dark">{{ prescription_stats.listed_rows|length }} brands in list</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
+            <table class="table table-sm table-hover mb-0">
+                <thead class="table-light sticky-top">
+                    <tr>
+                        <th>Medication</th>
+                        <th>Generic</th>
+                        <th>Form</th>
+                        <th class="text-end" style="width: 120px;">Times Prescribed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in prescription_stats.listed_rows %}
+                    <tr class="{% if row.count == 0 %}text-muted{% endif %}">
+                        <td><strong>{{ row.display }}</strong></td>
+                        <td>{{ row.generic_name }}</td>
+                        <td>{{ row.formulation if row.formulation else '-' }}</td>
+                        <td class="text-end">
+                            {% if row.count > 0 %}
+                            <span class="badge bg-success">{{ row.count }}</span>
+                            {% else %}
+                            <span class="badge bg-secondary">0</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-pen"></i> Prescription Counts — Not in Database (Custom)</h5>
+        <span class="badge bg-dark">{{ prescription_stats.custom_rows|length }} custom drugs</span>
+    </div>
+    <div class="card-body">
+        {% if prescription_stats.custom_rows %}
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Drug Name (as entered)</th>
+                        <th class="text-end" style="width: 120px;">Times Prescribed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in prescription_stats.custom_rows %}
+                    <tr>
+                        <td><strong>{{ row.name }}</strong></td>
+                        <td class="text-end"><span class="badge bg-warning text-dark">{{ row.count }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No custom drugs prescribed yet. Drugs entered via "Enter drug not in list" will appear here.</p>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Generic Drugs & Brand Medications</h5>
+    </div>
+    <div class="card-body">
+        {% if drugs %}
+        <div class="accordion" id="medicationAccordion">
+            {% for drug in drugs %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ drug.id }}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ drug.id }}">
+                        <strong>{{ drug.generic_name }}</strong>
+                        {% if drug.drug_class %}
+                        <span class="badge bg-info ms-2">{{ drug.drug_class }}</span>
+                        {% endif %}
+                        <span class="badge bg-success ms-2">{{ drug.brands|length }} brands</span>
+                    </button>
+                </h2>
+                <div id="collapse{{ drug.id }}" class="accordion-collapse collapse" data-bs-parent="#medicationAccordion">
+                    <div class="accordion-body">
+                        {% if drug.indication %}
+                        <p class="mb-3"><strong>Indication:</strong> {{ drug.indication }}</p>
+                        {% endif %}
+                        
+                        {% if drug.brands %}
+                        <h6>Available Brands:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Brand Name</th>
+                                        <th>Manufacturer</th>
+                                        <th>Strength</th>
+                                        <th>Formulation</th>
+                                        <th>Price</th>
+                                        <th class="text-end">Times Prescribed</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for brand in drug.brands %}
+                                    {% if brand.brand_name != 'Manual Entry' %}
+                                    <tr>
+                                        <td><strong>{{ format_brand_label(brand) }}</strong></td>
+                                        <td>{{ brand.manufacturer if brand.manufacturer else '-' }}</td>
+                                        <td>{{ brand.strength if brand.strength else '-' }}</td>
+                                        <td>{{ brand.formulation if brand.formulation else '-' }}</td>
+                                        <td>{{ '₹' + brand.price|string if brand.price else '-' }}</td>
+                                        <td class="text-end">
+                                            {% set rx_count = brand_counts.get(brand.id, 0) %}
+                                            {% if rx_count > 0 %}
+                                            <span class="badge bg-success">{{ rx_count }}</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">0</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No brands available for this generic drug.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-pills fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No medications in database. Upload a medication list to get started!</p>
+            <a href="{{ url_for('upload_medications') }}" class="btn btn-primary">Upload Medications</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

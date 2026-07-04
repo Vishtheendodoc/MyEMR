@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Prescription Preview - {{ visit.patient.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .preview-toolbar {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+    }
+    .layout-control input[type="range"] {
+        width: 110px;
+        vertical-align: middle;
+    }
+    .preview-frame-wrap {
+        background: #e9ecef;
+        border-radius: 8px;
+        padding: 12px;
+        min-height: 80vh;
+    }
+    .preview-frame-wrap iframe {
+        width: 100%;
+        min-height: 78vh;
+        border: none;
+        background: #fff;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .html-preview-card {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-12">
+        <h2><i class="fas fa-file-medical"></i> Prescription Preview</h2>
+        <p class="text-muted mb-0">
+            <strong>Patient:</strong> {{ visit.patient.name }}
+            | <strong>Visit:</strong> {{ visit.visit_date.strftime('%Y-%m-%d') }}
+            <span id="pageCountBadge" class="badge bg-info{% if not visit.pdf_page_count %} d-none{% endif %}">
+                {% if visit.pdf_page_count %}{{ visit.pdf_page_count }} page{{ 's' if visit.pdf_page_count != 1 else '' }}{% endif %}
+            </span>
+        </p>
+    </div>
+</div>
+
+<div class="preview-toolbar">
+    <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-primary active" id="btnPdfPreview">
+                    <i class="fas fa-file-pdf"></i> PDF Preview
+                </button>
+                <button type="button" class="btn btn-outline-primary" id="btnHtmlPreview">
+                    <i class="fas fa-eye"></i> HTML Preview
+                </button>
+            </div>
+
+            <div class="layout-control d-flex align-items-center gap-2">
+                <label for="fontSizeRange" class="form-label mb-0"><i class="fas fa-text-height"></i> Font:</label>
+                <input type="range" id="fontSizeRange" min="9" max="16" step="1" value="{{ font_size }}">
+                <input type="number" id="fontSizeInput" class="form-control form-control-sm" style="width: 65px;"
+                       min="9" max="16" step="1" value="{{ font_size }}">
+                <span class="text-muted small">pt</span>
+            </div>
+
+            <div class="layout-control d-flex align-items-center gap-2">
+                <label for="headerSpaceRange" class="form-label mb-0"><i class="fas fa-arrows-alt-v"></i> Top space:</label>
+                <input type="range" id="headerSpaceRange" min="0" max="50" step="1" value="{{ header_space }}">
+                <input type="number" id="headerSpaceInput" class="form-control form-control-sm" style="width: 65px;"
+                       min="0" max="50" step="1" value="{{ header_space }}">
+                <span class="text-muted small">mm</span>
+            </div>
+
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnApplyLayout">
+                Apply
+            </button>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('visit_detail', visit_id=visit.id) }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Visit
+            </a>
+            <a href="#" id="btnDownloadPdf" class="btn btn-success">
+                <i class="fas fa-download"></i> Download PDF
+            </a>
+            <button type="button" class="btn btn-warning" id="btnPrint">
+                <i class="fas fa-print"></i> Print
+            </button>
+        </div>
+    </div>
+    <div class="small text-muted mt-2">
+        Adjust <strong>font</strong> and <strong>top space</strong> above the header (Endocrinology Department), click <strong>Apply</strong>, then preview, print, or download.
+    </div>
+</div>
+
+<div id="pdfPreviewPanel" class="preview-frame-wrap">
+    <iframe id="pdfFrame" title="Prescription PDF Preview"></iframe>
+</div>
+
+<div id="htmlPreviewPanel" class="html-preview-card" style="display: none;">
+    <div class="p-2 border-bottom bg-light small text-muted">
+        HTML layout at <span id="htmlFontLabel">{{ font_size }}</span> pt,
+        top space <span id="htmlHeaderLabel">{{ header_space }}</span> mm.
+    </div>
+    <div class="p-3" id="htmlPreviewContent">
+        {{ html_preview|safe }}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const visitId = {{ visit.id }};
+let fontSize = {{ font_size }};
+let headerSpace = {{ header_space }};
+
+function layoutQuery() {
+    return `font_size=${fontSize}&header_space=${headerSpace}`;
+}
+
+function pdfPreviewUrl() {
+    return `/visit/${visitId}/prescription/pdf?${layoutQuery()}&t=${Date.now()}`;
+}
+
+function downloadUrl() {
+    return `/generate_pdf/${visitId}?${layoutQuery()}`;
+}
+
+function htmlPreviewUrl() {
+    return `/visit/${visitId}/prescription/preview/html?${layoutQuery()}`;
+}
+
+function printUrl() {
+    return `/visit/${visitId}/prescription/print?${layoutQuery()}`;
+}
+
+function syncLayoutInputs() {
+    $('#fontSizeRange').val(fontSize);
+    $('#fontSizeInput').val(fontSize);
+    $('#headerSpaceRange').val(headerSpace);
+    $('#headerSpaceInput').val(headerSpace);
+    $('#htmlFontLabel').text(fontSize);
+    $('#htmlHeaderLabel').text(headerSpace);
+    $('#btnDownloadPdf').attr('href', downloadUrl());
+}
+
+function refreshPreview() {
+    syncLayoutInputs();
+    $('#pdfFrame').attr('src', pdfPreviewUrl());
+    $.get(htmlPreviewUrl(), function(html) {
+        $('#htmlPreviewContent').html(html);
+    });
+}
+
+function readLayoutFromInputs() {
+    let fs = parseInt($('#fontSizeInput').val(), 10);
+    let hs = parseInt($('#headerSpaceInput').val(), 10);
+    if (isNaN(fs)) fs = 12;
+    if (isNaN(hs)) hs = 0;
+    fontSize = Math.max(9, Math.min(16, fs));
+    headerSpace = Math.max(0, Math.min(50, hs));
+}
+
+$('#fontSizeRange').on('input', function() {
+    $('#fontSizeInput').val($(this).val());
+});
+
+$('#fontSizeInput').on('input', function() {
+    let val = parseInt($(this).val(), 10);
+    if (isNaN(val)) return;
+    val = Math.max(9, Math.min(16, val));
+    $('#fontSizeRange').val(val);
+});
+
+$('#headerSpaceRange').on('input', function() {
+    $('#headerSpaceInput').val($(this).val());
+});
+
+$('#headerSpaceInput').on('input', function() {
+    let val = parseInt($(this).val(), 10);
+    if (isNaN(val)) return;
+    val = Math.max(0, Math.min(50, val));
+    $('#headerSpaceRange').val(val);
+});
+
+function printCurrentPreview() {
+    if ($('#pdfPreviewPanel').is(':visible')) {
+        const frame = document.getElementById('pdfFrame');
+        try {
+            frame.contentWindow.focus();
+            frame.contentWindow.print();
+        } catch (e) {
+            window.open(printUrl(), '_blank');
+        }
+        return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        alert('Please allow pop-ups to print the prescription.');
+        return;
+    }
+    printWindow.document.write('<html><head><title>Print Prescription</title></head><body>');
+    printWindow.document.write($('#htmlPreviewContent').html());
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+}
+
+$('#btnPrint').on('click', function() {
+    printCurrentPreview();
+});
+
+$('#btnApplyLayout').on('click', function() {
+    readLayoutFromInputs();
+    refreshPreview();
+});
+
+$('#btnPdfPreview').on('click', function() {
+    $('#btnPdfPreview').addClass('active btn-primary').removeClass('btn-outline-primary');
+    $('#btnHtmlPreview').removeClass('active btn-primary').addClass('btn-outline-primary');
+    $('#pdfPreviewPanel').show();
+    $('#htmlPreviewPanel').hide();
+});
+
+$('#btnHtmlPreview').on('click', function() {
+    $('#btnHtmlPreview').addClass('active btn-primary').removeClass('btn-outline-primary');
+    $('#btnPdfPreview').removeClass('active btn-primary').addClass('btn-outline-primary');
+    $('#htmlPreviewPanel').show();
+    $('#pdfPreviewPanel').hide();
+});
+
+syncLayoutInputs();
+$('#pdfFrame').attr('src', pdfPreviewUrl());
+</script>
+{% endblock %}

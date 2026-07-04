@@ -1,0 +1,423 @@
+{% extends "base.html" %}
+
+{% block title %}Add Prescription - {{ visit.patient.name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-12">
+        <h2><i class="fas fa-prescription"></i> Add Prescription</h2>
+        <p class="text-muted">
+            <strong>Patient:</strong> {{ visit.patient.name }} ({{ visit.patient.age }} yrs, {{ visit.patient.sex }})
+            | <strong>Visit:</strong> {{ visit.visit_date.strftime('%Y-%m-%d') }}
+            {% if visit.chief_complaints %}
+            | <strong>Complaints:</strong> {{ visit.chief_complaints[:50] }}{% if visit.chief_complaints|length > 50 %}...{% endif %}
+            {% endif %}
+        </p>
+        {% if visit.comorbidities %}
+        <p class="text-warning">
+            <i class="fas fa-exclamation-triangle"></i> <strong>Comorbidities:</strong> 
+            {% for comorbidity in visit.comorbidities.split(',') %}
+            <span class="badge bg-warning text-dark">{{ comorbidity.strip() }}</span>
+            {% endfor %}
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Prescription Form</h5>
+            </div>
+            <div class="card-body">
+                <div id="warningAlert" class="alert alert-warning" style="display: none;">
+                    <h5 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Drug-Comorbidity Warnings</h5>
+                    <ul id="warningList"></ul>
+                </div>
+                
+                <form id="prescriptionForm" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label d-block">Drug Entry Mode</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="drugMode" id="modeSearch" value="search" checked>
+                            <label class="form-check-label" for="modeSearch">Search from database</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="drugMode" id="modeCustom" value="custom">
+                            <label class="form-check-label" for="modeCustom">Enter drug not in list</label>
+                        </div>
+                    </div>
+
+                    <div id="searchDrugSection">
+                        <div class="mb-3">
+                            <label class="form-label">Search Generic or Brand Name</label>
+                            <input type="text" class="form-control" id="genericSearch" placeholder="Type generic or brand name...">
+                            <div id="searchResults" class="list-group mt-2" style="display: none;"></div>
+                            <input type="hidden" id="selectedGenericId">
+                            <input type="hidden" id="selectedBrandId">
+                        </div>
+                        
+                        <div class="mb-3" id="brandSection" style="display: none;">
+                            <label class="form-label">Select Brand Medication</label>
+                            <select class="form-select" id="brandSelect">
+                                <option value="">-- Select Brand --</option>
+                            </select>
+                            <small class="form-text text-muted">Shows Tab, Cap, Inj, Gel, etc. with drug name</small>
+                        </div>
+                    </div>
+
+                    <div id="customDrugSection" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label">Drug Name</label>
+                            <input type="text" class="form-control" id="customDrugName" placeholder="e.g., Inj NewBrand 30/70 or Tab SomeDrug 500mg">
+                            <small class="form-text text-muted">Include form prefix: Tab, Cap, Inj, Syp, Gel, Cream</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Generic Name (optional)</label>
+                            <input type="text" class="form-control" id="customGenericName" placeholder="e.g., Insulin Glargine">
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="customIsInsulin">
+                            <label class="form-check-label" for="customIsInsulin">Use insulin dosing (morning / afternoon / evening)</label>
+                        </div>
+                    </div>
+
+                    <div id="insulinDoseSection" class="mb-3" style="display: none;">
+                        <label class="form-label">Insulin Doses (units)</label>
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label small">Morning</label>
+                                <input type="text" class="form-control" id="doseMorning" placeholder="e.g., 10">
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label small">Afternoon</label>
+                                <input type="text" class="form-control" id="doseAfternoon" placeholder="e.g., 0">
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label small">Evening</label>
+                                <input type="text" class="form-control" id="doseEvening" placeholder="e.g., 8">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row" id="standardDoseRow">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Dosage</label>
+                            <input type="text" class="form-control" id="dosage" placeholder="e.g., 500mg">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Frequency</label>
+                            <select class="form-select" id="frequency">
+                                <option value="">-- Select --</option>
+                                <option value="OD">OD (Once Daily)</option>
+                                <option value="BD">BD (Twice Daily)</option>
+                                <option value="TID">TID (Three Times Daily)</option>
+                                <option value="QID">QID (Four Times Daily)</option>
+                                <option value="SOS">SOS (As Needed)</option>
+                                <option value="STAT">STAT (Immediately)</option>
+                                <option value="Weekly">Weekly</option>
+                                <option value="Monthly">Monthly</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Timing</label>
+                            <select class="form-select" id="timing">
+                                <option value="">-- Select --</option>
+                                <option value="1-0-0">1-0-0 (Morning)</option>
+                                <option value="0-1-0">0-1-0 (Afternoon)</option>
+                                <option value="0-0-1">0-0-1 (Night)</option>
+                                <option value="1-1-0">1-1-0 (Morning & Afternoon)</option>
+                                <option value="1-0-1">1-0-1 (Morning & Night)</option>
+                                <option value="0-1-1">0-1-1 (Afternoon & Night)</option>
+                                <option value="1-1-1">1-1-1 (Three Times)</option>
+                                <option value="Before Food">Before Food</option>
+                                <option value="After Food">After Food</option>
+                                <option value="With Food">With Food</option>
+                                <option value="Empty Stomach">Empty Stomach</option>
+                                <option value="Bedtime">Bedtime</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Duration</label>
+                        <input type="text" class="form-control" id="duration" placeholder="e.g., 30 days">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Special Instructions</label>
+                        <textarea class="form-control" id="instructions" rows="3" placeholder="e.g., Take after meals"></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                        <a href="{{ url_for('visit_detail', visit_id=visit.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-save"></i> Add Prescription
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+let searchTimeout;
+let selectedIsInsulin = false;
+const visitId = {{ visit.id }};
+
+function applySuggestedDosage(option) {
+    const suggested = $(option).data('suggested-dosage');
+    const isInsulin = $(option).data('insulin') === true || $(option).data('insulin') === 'true';
+    if (suggested && !isInsulin) {
+        $('#dosage').val(suggested);
+    }
+}
+
+function updateInsulinUI() {
+    const showInsulin = selectedIsInsulin || $('#customIsInsulin').is(':checked');
+    if (showInsulin) {
+        $('#insulinDoseSection').show();
+        $('#dosage').closest('.col-md-4').find('.form-label').text('Dosage (optional)');
+    } else {
+        $('#insulinDoseSection').hide();
+        $('#doseMorning, #doseAfternoon, #doseEvening').val('');
+        $('#dosage').closest('.col-md-4').find('.form-label').text('Dosage');
+    }
+}
+
+function setDrugMode(mode) {
+    if (mode === 'custom') {
+        $('#searchDrugSection').hide();
+        $('#customDrugSection').show();
+        $('#selectedGenericId, #selectedBrandId').val('');
+        $('#brandSection').hide();
+    } else {
+        $('#searchDrugSection').show();
+        $('#customDrugSection').hide();
+        $('#customDrugName, #customGenericName').val('');
+        $('#customIsInsulin').prop('checked', false);
+        selectedIsInsulin = false;
+    }
+    updateInsulinUI();
+}
+
+$('input[name="drugMode"]').on('change', function() {
+    setDrugMode($(this).val());
+});
+
+$('#customIsInsulin').on('change', updateInsulinUI);
+
+$('#brandSelect').on('change', function() {
+    const option = $(this).find('option:selected');
+    selectedIsInsulin = option.data('insulin') === true || option.data('insulin') === 'true';
+    applySuggestedDosage(option);
+    updateInsulinUI();
+});
+
+$('#genericSearch').on('input', function() {
+    const query = $(this).val();
+    $('#selectedBrandId').val('');
+    
+    clearTimeout(searchTimeout);
+    
+    if (query.length < 2) {
+        $('#searchResults').hide();
+        return;
+    }
+    
+    searchTimeout = setTimeout(() => {
+        $.get('/api/search_generic?q=' + encodeURIComponent(query), function(data) {
+            if (data.length === 0) {
+                $('#searchResults').html('<div class="list-group-item text-muted">No drugs found — use "Enter drug not in list" above</div>').show();
+                return;
+            }
+            
+            let html = '';
+            data.forEach(item => {
+                if (item.type === 'brand') {
+                    html += `<a href="#" class="list-group-item list-group-item-action drug-item" data-type="brand" data-id="${item.id}" data-brand-id="${item.brand_id}" data-insulin="${item.is_insulin}">
+                        <strong>${item.display_label}</strong>
+                        <br><small class="text-muted">${item.generic_name}</small>
+                    </a>`;
+                } else {
+                    html += `<a href="#" class="list-group-item list-group-item-action drug-item" data-type="generic" data-id="${item.id}">
+                        <strong>${item.generic_name}</strong>
+                        ${item.drug_class ? `<br><small class="text-muted">${item.drug_class}</small>` : ''}
+                    </a>`;
+                }
+            });
+            
+            $('#searchResults').html(html).show();
+        }).fail(function() {
+            $('#searchResults').html('<div class="list-group-item text-danger">Error searching drugs</div>').show();
+        });
+    }, 300);
+});
+
+function loadBrands(genericId, preselectBrandId) {
+    $.get('/api/get_brands/' + genericId, function(brands) {
+        if (brands.length === 0) {
+            alert('No brand medications available for this generic drug.');
+            $('#brandSection').hide();
+            return;
+        }
+        
+        let options = '<option value="">-- Select Brand --</option>';
+        brands.forEach(brand => {
+            const selected = preselectBrandId && String(brand.id) === String(preselectBrandId) ? ' selected' : '';
+            const suggested = brand.suggested_dosage ? ` data-suggested-dosage="${brand.suggested_dosage}"` : '';
+            options += `<option value="${brand.id}" data-insulin="${brand.is_insulin}"${suggested}${selected}>${brand.display_label}${brand.manufacturer ? ' (' + brand.manufacturer + ')' : ''}${brand.price ? ' ₹' + brand.price : ''}</option>`;
+        });
+        
+        $('#brandSelect').html(options);
+        $('#brandSection').show();
+        if (preselectBrandId) {
+            $('#brandSelect').trigger('change');
+        }
+    }).fail(function() {
+        alert('Error loading brand medications. Please try again.');
+    });
+}
+
+$(document).on('click', '.drug-item', function(e) {
+    e.preventDefault();
+    const type = $(this).data('type');
+    const drugId = $(this).data('id');
+    
+    if (type === 'brand') {
+        const brandId = $(this).data('brand-id');
+        const label = $(this).find('strong').text();
+        selectedIsInsulin = $(this).data('insulin') === true || $(this).data('insulin') === 'true';
+        
+        $('#genericSearch').val(label);
+        $('#selectedGenericId').val(drugId);
+        $('#selectedBrandId').val(brandId);
+        $('#searchResults').hide();
+        
+        loadBrands(drugId, brandId);
+        updateInsulinUI();
+        return;
+    }
+    
+    const drugName = $(this).find('strong').text();
+    $('#genericSearch').val(drugName);
+    $('#selectedGenericId').val(drugId);
+    $('#selectedBrandId').val('');
+    $('#searchResults').hide();
+    selectedIsInsulin = false;
+    loadBrands(drugId);
+    updateInsulinUI();
+});
+
+$('#prescriptionForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    const isCustom = $('#modeCustom').is(':checked');
+    const doseMorning = $('#doseMorning').val().trim();
+    const doseAfternoon = $('#doseAfternoon').val().trim();
+    const doseEvening = $('#doseEvening').val().trim();
+    const hasInsulinDoses = !!(doseMorning || doseAfternoon || doseEvening);
+    const dosage = $('#dosage').val().trim();
+    const frequency = $('#frequency').val();
+    const duration = $('#duration').val().trim();
+
+    const data = {
+        visit_id: visitId,
+        dosage: dosage || null,
+        dose_morning: doseMorning || null,
+        dose_afternoon: doseAfternoon || null,
+        dose_evening: doseEvening || null,
+        frequency: frequency || null,
+        timing: $('#timing').val() || null,
+        duration: duration,
+        instructions: $('#instructions').val()
+    };
+
+    if (isCustom) {
+        const customName = $('#customDrugName').val().trim();
+        if (!customName) {
+            alert('Please enter the drug name');
+            return;
+        }
+        data.custom_drug_name = customName;
+        data.custom_generic_name = $('#customGenericName').val().trim() || null;
+    } else {
+        const genericId = $('#selectedGenericId').val();
+        if (!genericId) {
+            alert('Please search and select a drug from the list');
+            return;
+        }
+        const brandId = $('#brandSelect').val() || $('#selectedBrandId').val();
+        if (!brandId) {
+            alert('Please select a brand medication');
+            return;
+        }
+        data.brand_id = parseInt(brandId, 10);
+    }
+
+    if (!duration) {
+        alert('Please enter duration');
+        return;
+    }
+    if (!hasInsulinDoses && !dosage) {
+        alert('Please enter dosage or insulin doses (morning/afternoon/evening)');
+        return;
+    }
+    if (!hasInsulinDoses && !frequency) {
+        alert('Please select frequency');
+        return;
+    }
+    
+    $('#submitBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+    
+    $.ajax({
+        url: '/api/add_prescription',
+        type: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify(data),
+        success: function(response) {
+            if (response.warnings && response.warnings.length > 0) {
+                let warningHtml = '';
+                response.warnings.forEach(warning => {
+                    warningHtml += `<li><strong>${warning.drug}</strong> with <strong>${warning.comorbidity}</strong>: ${warning.recommendation} <span class="badge bg-${warning.severity === 'high' ? 'danger' : 'warning'}">${warning.severity}</span></li>`;
+                });
+                $('#warningList').html(warningHtml);
+                $('#warningAlert').show();
+                
+                setTimeout(() => {
+                    window.location.href = '/visit/' + visitId;
+                }, 3000);
+            } else {
+                window.location.href = '/visit/' + visitId;
+            }
+        },
+        error: function(xhr) {
+            let message = 'Error adding prescription';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+                message = xhr.responseJSON.error;
+            } else if (xhr.status === 403) {
+                message = 'Unauthorized. Please log in again.';
+            }
+            alert(message);
+            $('#submitBtn').prop('disabled', false).html('<i class="fas fa-save"></i> Add Prescription');
+        }
+    });
+});
+
+$(document).click(function(e) {
+    if (!$(e.target).closest('#genericSearch, #searchResults').length) {
+        $('#searchResults').hide();
+    }
+});
+});
+</script>
+{% endblock %}

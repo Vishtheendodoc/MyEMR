@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Diagnoses - Endocrinology EMR{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-upload"></i> Upload Diagnosis List</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5 class="alert-heading"><i class="fas fa-info-circle"></i> Upload Format Requirements</h5>
+                    <p>Upload a CSV or Excel file with the following columns:</p>
+                    <ul class="mb-0">
+                        <li><strong>diagnosis_name</strong> (required) - Name of the diagnosis</li>
+                        <li><strong>category</strong> (optional) - e.g., Endocrine, Metabolic</li>
+                        <li><strong>icd_code</strong> (optional) - ICD-10 code</li>
+                        <li><strong>description</strong> (optional) - Additional details</li>
+                    </ul>
+                </div>
+                
+                <div class="alert alert-success">
+                    <h6><i class="fas fa-file-csv"></i> Sample CSV Format:</h6>
+                    <pre class="mb-0" style="background: #f8f9fa; padding: 10px; border-radius: 5px;">diagnosis_name,category,icd_code,description
+Type 1 Diabetes Mellitus,Endocrine,E10,Insulin dependent diabetes
+Type 2 Diabetes Mellitus,Endocrine,E11,Non-insulin dependent diabetes
+Hypothyroidism,Endocrine,E03,Underactive thyroid
+Hyperthyroidism,Endocrine,E05,Overactive thyroid
+Diabetic Nephropathy,Complication,E11.21,Kidney damage from diabetes
+Diabetic Retinopathy,Complication,E11.31,Eye damage from diabetes</pre>
+                </div>
+                
+                <form method="POST" action="" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.file.label(class="form-label") }}
+                        {{ form.file(class="form-control" + (' is-invalid' if form.file.errors else '')) }}
+                        {% if form.file.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.file.errors %}<span>{{ error }}</span>{% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Accepted formats: CSV (.csv), Excel (.xlsx, .xls)</small>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                        <a href="{{ url_for('diagnoses') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Diagnoses
+                        </a>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-download"></i> Download Sample Template</h5>
+            </div>
+            <div class="card-body">
+                <p>Download a sample template to get started quickly:</p>
+                <a href="#" class="btn btn-success" id="downloadTemplate">
+                    <i class="fas fa-download"></i> Download CSV Template
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$('#downloadTemplate').on('click', function(e) {
+    e.preventDefault();
+    
+    const csvContent = `diagnosis_name,category,icd_code,description
+Type 1 Diabetes Mellitus,Endocrine,E10,Insulin dependent diabetes
+Type 2 Diabetes Mellitus,Endocrine,E11,Non-insulin dependent diabetes
+Hypothyroidism,Endocrine,E03,Underactive thyroid
+Hyperthyroidism,Endocrine,E05,Overactive thyroid
+Hashimoto's Thyroiditis,Endocrine,E06.3,Autoimmune thyroid disease
+Graves Disease,Endocrine,E05.0,Autoimmune hyperthyroidism
+Diabetic Nephropathy,Complication,E11.21,Kidney damage from diabetes
+Diabetic Retinopathy,Complication,E11.31,Eye damage from diabetes
+Diabetic Neuropathy,Complication,E11.40,Nerve damage from diabetes
+Addison's Disease,Endocrine,E27.1,Adrenal insufficiency
+Cushing's Syndrome,Endocrine,E24,Excess cortisol
+Hyperparathyroidism,Endocrine,E21,Overactive parathyroid
+Hypoparathyroidism,Endocrine,E20,Underactive parathyroid
+Polycystic Ovary Syndrome,Endocrine,E28.2,PCOS
+Metabolic Syndrome,Metabolic,E88.81,Cluster of metabolic conditions
+Obesity,Metabolic,E66,Excess body weight
+Hyperlipidemia,Metabolic,E78,High cholesterol/lipids
+Osteoporosis,Metabolic,M81,Bone density loss
+Vitamin D Deficiency,Metabolic,E55,Low vitamin D`;
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'diagnosis_template.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+});
+</script>
+{% endblock %}

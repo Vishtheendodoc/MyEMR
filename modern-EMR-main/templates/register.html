@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Endocrinology EMR{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white text-center">
+                <h3 class="mb-0"><i class="fas fa-user-plus"></i> Create Account</h3>
+                <p class="mb-0 mt-2">Register as an Endocrinologist</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            {{ form.email(class="form-control" + (' is-invalid' if form.email.errors else ''), placeholder="you@clinic.com") }}
+                        </div>
+                        {% if form.email.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.email.errors %}<small>{{ error }}</small>{% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Used to login. Must be unique.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.display_name.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user-md"></i></span>
+                            {{ form.display_name(class="form-control" + (' is-invalid' if form.display_name.errors else ''), placeholder="Dr. Vishwanath S") }}
+                        </div>
+                        {% if form.display_name.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.display_name.errors %}<small>{{ error }}</small>{% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Shown on prescriptions. Multiple doctors can share the same name.</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            {{ form.password(class="form-control" + (' is-invalid' if form.password.errors else ''), placeholder="Choose a strong password") }}
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.password.errors %}<small>{{ error }}</small>{% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Password must be at least 6 characters</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.qualifications.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-graduation-cap"></i></span>
+                            {{ form.qualifications(class="form-control", placeholder="e.g., MBBS, MD (Endocrinology)") }}
+                        </div>
+                        <small class="form-text text-muted">Your medical qualifications (optional - can add later)</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.kmc_number.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                            {{ form.kmc_number(class="form-control", placeholder="e.g., KMC-12345") }}
+                        </div>
+                        <small class="form-text text-muted">Karnataka Medical Council registration number (optional - can add later)</small>
+                    </div>
+                    
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-success btn-lg") }}
+                    </div>
+                </form>
+                
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <p class="mb-0">Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

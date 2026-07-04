@@ -1,0 +1,63 @@
+generic_name,brand_name,drug_class,indication,manufacturer,strength,formulation,price
+Metformin,Glycomet,Biguanide,Type 2 Diabetes,USV Ltd,500mg,Tablet,12.50
+Metformin,Glucophage,Biguanide,Type 2 Diabetes,Abbott,500mg,Tablet,15.00
+Glimepiride,Amaryl,Sulfonylurea,Type 2 Diabetes,Sanofi,1mg,Tablet,25.00
+Glimepiride,Glimestar,Sulfonylurea,Type 2 Diabetes,Sun Pharma,1mg,Tablet,20.00
+Insulin Glargine,Lantus,Long-acting Insulin,Type 1 & 2 Diabetes,Sanofi,100 IU/ml,Injection,850.00
+Insulin Glargine,Basalog,Long-acting Insulin,Type 1 & 2 Diabetes,Biocon,100 IU/ml,Injection,650.00
+Levothyroxine,Eltroxin,Thyroid Hormone,Hypothyroidism,GSK,50mcg,Tablet,35.00
+Levothyroxine,Thyronorm,Thyroid Hormone,Hypothyroidism,Abbott,50mcg,Tablet,32.00
+Dapagliflozin + Sitagliptin + Metformin,Dapaturn SM,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,10/100/1000,Tablet,238.00
+Telmisartan + Cilnidipine,Telista CL,Antihypertensive Combination,Hypertension,Lupin Ltd,40/10 mg,Tablet,201.45
+Dapagliflozin + Glimepiride + Metformin,Udapa Gold 1,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,10/1/500,Tablet,250.00
+Dapagliflozin + Glimepiride + Metformin,Udapa Gold 2,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,10/2/500,Tablet,280.00
+Glimepiride + Metformin,Zoryl M1,Antidiabetic Combination,Type 2 Diabetes,Intas Pharma,1/500 mg,Tablet,95.00
+Glimepiride + Metformin,Zoryl M2,Antidiabetic Combination,Type 2 Diabetes,Intas Pharma,2/500 mg,Tablet,120.00
+Rosuvastatin,Rosumac 10,Statin,Hyperlipidemia,Macleods,10mg,Tablet,150.00
+Rosuvastatin + Fenofibrate,Novostat TG 10,Lipid-lowering Combination,Hyperlipidemia,Lupin Ltd,10/160 mg,Tablet,200.00
+Dapagliflozin + Sitagliptin + Metformin,Udapa Trio 500,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,10/100/500,Tablet,210.00
+Dapagliflozin + Sitagliptin + Metformin,Udapa Trio 1000,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,10/100/1000,Tablet,238.00
+Montelukast + Desloratadine,Mondeslor 10,Antiallergic Combination,Allergic Rhinitis,Sun Pharma,10/5 mg,Tablet,168.00
+Esomeprazole + Domperidone,Somprez D 40,GI Combination,GERD,Sun Pharma,40/30 mg,Capsule,166.50
+Cilnidipine + Telmisartan,Dilnip T 10,Antihypertensive Combination,Hypertension,Lupin Ltd,10/40 mg,Tablet,315.00
+Empagliflozin + Linagliptin,Linapride E,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharma,10/5 mg,Tablet,180.00
+Dapagliflozin + Linagliptin + Metformin,Linapride DM,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharma,10/5/1000,Tablet,280.00
+Empagliflozin + Linagliptin + Metformin,Linacip EM,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharma,25/5/1000,Tablet,350.00
+Dapagliflozin + Sitagliptin + Metformin,Oxramet S XR,Antidiabetic Combination,Type 2 Diabetes,MSN Labs,10/100/1000,Tablet,220.00
+Empagliflozin + Linagliptin,Liralin EP,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharma,25/5 mg,Tablet,200.00
+Empagliflozin,Xenia 25,SGLT2 Inhibitor,Type 2 Diabetes,USV Ltd,25mg,Tablet,163.90
+Empagliflozin + Metformin,Xenia M,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,12.5/500 mg,Tablet,140.00
+Fenofibrate + Rosuvastatin,Fenocor R 10,Lipid-lowering Combination,Hyperlipidemia,Intas Pharma,160/10 mg,Tablet,200.00
+Semaglutide,Semaneo,GLP-1 Agonist,Type 2 Diabetes / Weight Management,Intas Pharma,0.25-2.4 mg,Injection,1199.00
+Semaglutide,Sematrinity,GLP-1 Agonist,Type 2 Diabetes,Sun Pharma,2-4 mg,Injection,1300.00
+Semaglutide,Noveltreat,GLP-1 Agonist,Weight Management,Sun Pharma,0.25-2.4 mg,Injection,2000.00
+Cilnidipine + Telmisartan,Telplus 40,Antihypertensive Combination,Hypertension,Sun Pharma,10/40 mg,Tablet,200.00
+Domperidone + Rabeprazole,Veloz D,GI Combination,GERD,Torrent Pharma,30/20 mg,Capsule,150.00
+Pancreatin,Enzar HS,Digestive Enzyme,Pancreatic Insufficiency,Torrent Pharma,250mg,Capsule,180.00
+Nutritional Supplement,Prohance D,Nutritional Supplement,Diabetes Nutrition,Sun Pharma,200g,Powder,400.00
+Sitagliptin + Empagliflozin + Metformin,Istamet EMpa 25,Antidiabetic Combination,Type 2 Diabetes,MSD,25/100/1000,Tablet,350.00
+Dapagliflozin + Sitagliptin,Dapefy S,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/100,Tablet,220.00
+Dapagliflozin,Dapefy,SGLT2 Inhibitor,Type 2 Diabetes,Sun Pharma,10mg,Tablet,205.00
+Glimepiride + Metformin,Gemer 1,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,1/500 mg,Tablet,55.00
+Glimepiride + Metformin,Gemer 2,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,2/500 mg,Tablet,65.00
+Glimepiride + Metformin + Voglibose,Gemer V 1,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,1/500/0.2 mg,Tablet,130.00
+Glimepiride + Metformin + Voglibose,Gemer V 2,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,2/500/0.2 mg,Tablet,150.00
+Glimepiride + Metformin,Gluconorm G 1,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,1/500 mg,Tablet,90.00
+Glimepiride + Metformin,Gluconorm G 2,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,2/500 mg,Tablet,110.00
+Glimepiride + Metformin + Pioglitazone,Gluconorm PG 1,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,1/500/15 mg,Tablet,94.00
+Glimepiride + Metformin + Pioglitazone,Gluconorm PG 2,Antidiabetic Combination,Type 2 Diabetes,Lupin Ltd,2/500/15 mg,Tablet,119.00
+Glimepiride + Metformin,Glycomet GP 1,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,1/500 mg,Tablet,59.00
+Glimepiride + Metformin,Glycomet GP 2,Antidiabetic Combination,Type 2 Diabetes,USV Ltd,2/500 mg,Tablet,75.00
+Gabapentin + Lidocaine,Sentidor Gel,Neuropathic Pain Agent,Neuropathic Pain,Anthem Biopharma,6/5%,Gel,350.00
+Gabapentin + Lidocaine,Gabacure Gel,Neuropathic Pain Agent,Neuropathic Pain,HBC Lifesciences,6/5%,Gel,300.00
+Urea + Allantoin,FootSave Plus,Topical Emollient,Diabetic Foot Care,Anthem Biopharma,50g,Cream,155.00
+Empagliflozin,Empaneo,SGLT2 Inhibitor,Type 2 Diabetes,Intas Pharma,25mg,Tablet,200.00
+Empagliflozin + Sitagliptin + Metformin,Empaneo SM,Antidiabetic Combination,Type 2 Diabetes,Intas Pharma,25/100/1000,Tablet,350.00
+Empagliflozin + Linagliptin + Metformin,Linapride EM,Antidiabetic Combination,Type 2 Diabetes,Torrent Pharma,25/5/1000,Tablet,350.00
+Dapagliflozin + Sitagliptin,Oxra S,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/100,Tablet,270.00
+Dapagliflozin + Glimepiride + Metformin,GemerDapa XR 1,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/1/1000,Tablet,280.00
+Dapagliflozin + Glimepiride + Metformin,GemerDapa XR 2,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/2/1000,Tablet,300.00
+Dapagliflozin + Glimepiride + Metformin,Oxramet G XR 10/1/1000,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/1/1000,Tablet,105.00
+Dapagliflozin + Glimepiride + Metformin,Oxramet G XR 10/2/1000,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/2/1000,Tablet,119.00
+Dapagliflozin + Glimepiride + Metformin,Oxramet G XR 10/1/500,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/1/500,Tablet,101.50
+Dapagliflozin + Glimepiride + Metformin,Oxramet G XR 10/2/500,Antidiabetic Combination,Type 2 Diabetes,Sun Pharma,10/2/500,Tablet,112.00
