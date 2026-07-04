@@ -33,11 +33,10 @@ services:
           name: endo-emr-web
           envVarKey: RENDER_EXTERNAL_URL
 
-  # React frontend (static build)
+  # React frontend (static build — no plan field; static sites are billed separately)
   - type: web
     name: endo-emr-web
     runtime: static
-    plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     rootDir: frontend
