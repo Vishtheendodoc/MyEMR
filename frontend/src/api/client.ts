@@ -215,9 +215,24 @@ export interface Bill {
   patient_name: string | null;
   description: string;
   amount: number;
+  base_amount?: number | null;
+  gst_percent?: number;
+  gst_amount?: number;
   procedure_code: string | null;
   payment_status: string;
   payment_method: string | null;
+  invoice_number?: string | null;
+  created_at?: string;
+}
+
+export interface BillingVisitOption {
+  visit_id: number;
+  patient_id: number;
+  patient_name: string;
+  patient_mrd: string;
+  visit_date: string;
+  visit_type: string;
+  diagnosis: string | null;
 }
 
 export interface AnalyticsData {
@@ -452,6 +467,8 @@ export const api = {
   updateAppointmentStatus: (id: number, status: string) =>
     request<{ success: boolean }>(`/api/v1/appointments/${id}/status?status=${encodeURIComponent(status)}`, { method: 'PATCH' }),
   bills: () => request<Bill[]>('/api/v1/bills'),
+  billingVisitOptions: () => request<BillingVisitOption[]>('/api/v1/billing/visit-options'),
   createBill: (data: Record<string, unknown>) => request<Bill>('/api/v1/bills', { method: 'POST', body: JSON.stringify(data) }),
+  updateBill: (id: number, data: Record<string, unknown>) => request<Bill>(`/api/v1/bills/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   analytics: () => request<AnalyticsData>('/api/v1/analytics'),
 };

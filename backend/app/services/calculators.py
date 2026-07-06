@@ -1,7 +1,6 @@
 """Clinical calculators for endocrine practice."""
 
-import math
-
+import pyprevent
 from pydantic import BaseModel, Field
 
 
@@ -105,42 +104,67 @@ def _risk_category(risk_pct: float) -> str:
     return "High"
 
 
+def _normalize_prevent_sex(sex: str) -> str:
+    return "female" if sex.strip().lower().startswith("f") else "male"
+
+
+def _clamp_prevent_value(value: float, lo: float, hi: float, label: str, notes: list[str]) -> float:
+    if value < lo:
+        notes.append(f"{label} clamped from {value} to {lo}")
+        return lo
+    if value > hi:
+        notes.append(f"{label} clamped from {value} to {hi}")
+        return hi
+    return value
+
+
+def _prepare_prevent_params(data: PreventInput) -> tuple[dict, list[str]]:
+    notes: list[str] = []
+
+    bmi = data.bmi if data.bmi is not None else 25.0
+    if data.bmi is None:
+        notes.append("BMI imputed as 25 (not provided)")
+
+    egfr = data.egfr if data.egfr is not None else 90.0
+    if data.egfr is None:
+        notes.append("eGFR imputed as 90 (not provided)")
+
+    params = {
+        "sex": _normalize_prevent_sex(data.sex),
+        "age": float(data.age),
+        "total_cholesterol": _clamp_prevent_value(data.total_cholesterol, 130, 320, "Total cholesterol", notes),
+        "hdl_cholesterol": _clamp_prevent_value(data.hdl_cholesterol, 20, 100, "HDL cholesterol", notes),
+        "systolic_bp": _clamp_prevent_value(data.sbp, 90, 200, "Systolic BP", notes),
+        "has_diabetes": data.diabetes,
+        "current_smoker": data.smoker,
+        "bmi": _clamp_prevent_value(bmi, 18.5, 39.9, "BMI", notes),
+        "egfr": _clamp_prevent_value(egfr, 15, 140, "eGFR", notes),
+        "on_htn_meds": data.on_antihypertensive,
+        "on_cholesterol_meds": data.on_statin,
+    }
+    return params, notes
+
+
 def calculate_prevent_ascvd(data: PreventInput) -> dict:
     """
-    AHA PREVENT-aligned cardiovascular risk estimate (primary prevention).
-    Uses major PREVENT inputs; outputs 10- and 30-year ASCVD and total CVD risk.
+    AHA PREVENT Base Model (Khan et al., Circulation 2024) via official equations.
+    Outputs 10- and 30-year ASCVD and total CVD risk percentages.
     """
-    female = data.sex.strip().lower().startswith("f")
-    ln_age = math.log(data.age)
+    params, notes = _prepare_prevent_params(data)
 
-    lp = 2.8 if female else 3.1
-    lp += 0.52 * ln_age
-    lp += 0.007 * (data.total_cholesterol - 170)
-    lp -= 0.009 * (data.hdl_cholesterol - 50)
-    lp += 0.014 * (data.sbp - 120)
-    if data.on_antihypertensive:
-        lp += 0.28
-    if data.diabetes:
-        lp += 0.58
-    if data.smoker:
-        lp += 0.48
-    if data.on_statin:
-        lp -= 0.12
-    if data.egfr is not None and data.egfr < 60:
-        lp += 0.32
-    elif data.egfr is not None and data.egfr < 90:
-        lp += 0.08
-    if data.bmi is not None:
-        lp += 0.022 * (data.bmi - 25)
+    ascvd_10 = round(pyprevent.calculate_10_yr_ascvd_risk(**params), 1)
+    total_cvd_10 = round(pyprevent.calculate_10_yr_cvd_risk(**params), 1)
 
-    ascvd_10 = 1 / (1 + math.exp(-(lp - 5.4)))
-    ascvd_10 = round(min(0.85, max(0.001, ascvd_10)) * 100, 1)
-    ascvd_30 = round(min(0.95, ascvd_10 * 2.4 + max(0, data.age - 30) * 0.18), 1)
-    total_cvd_10 = round(min(0.90, ascvd_10 * 1.18), 1)
-    total_cvd_30 = round(min(0.98, ascvd_30 * 1.15), 1)
+    ascvd_30 = None
+    total_cvd_30 = None
+    if data.age <= 59:
+        ascvd_30 = round(pyprevent.calculate_30_yr_ascvd_risk(**params), 1)
+        total_cvd_30 = round(pyprevent.calculate_30_yr_cvd_risk(**params), 1)
+    else:
+        notes.append("30-year risk not reported for age >59 per PREVENT model")
 
-    return {
-        "model": "AHA PREVENT (clinical estimate)",
+    result = {
+        "model": "AHA PREVENT Base Model",
         "ascvd_risk_10y": ascvd_10,
         "ascvd_risk_30y": ascvd_30,
         "total_cvd_risk_10y": total_cvd_10,
@@ -148,3 +172,13 @@ def calculate_prevent_ascvd(data: PreventInput) -> dict:
         "risk_category": _risk_category(ascvd_10),
         "unit": "%",
     }
+    if notes:
+        result["notes"] = notes
+    return result
+
+
+from app.services.pcos_scoring import (  # noqa: E402
+    FerrimanGallweyInput,
+    calculate_ferriman_gallwey,
+    interpret_ludwig,
+)

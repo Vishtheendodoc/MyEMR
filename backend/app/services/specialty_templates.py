@@ -5,6 +5,10 @@ from datetime import date
 from sqlalchemy.orm import Session
 
 from app.models import ImagingResult, LabResult
+from app.services.pcos_scoring import SCORING_ONLY_KEYS as PCOS_SCORING_KEYS
+from app.services.thyroid_scoring import THYROID_SCORING_ONLY_KEYS
+
+SCORING_ONLY_KEYS = PCOS_SCORING_KEYS | THYROID_SCORING_ONLY_KEYS
 
 # Shared lab panels — individual components per panel
 COMMON_PANELS: dict[str, dict] = {
@@ -90,8 +94,22 @@ TEMPLATE_SPECIFIC_LABELS: dict[str, dict[str, str]] = {
         "total_t4": "Total T4",
         "tpo_antibodies": "TPO Antibodies",
         "tshr_ab": "TSHR Ab",
-        "proptosis": "Proptosis",
-        "cas_score": "CAS Score",
+        "who_goitre_grade": "WHO Goitre Grade",
+        "who_goitre_interpretation": "WHO Goitre Interpretation",
+        "cas_total": "Clinical Activity Score (CAS)",
+        "cas_interpretation": "CAS Interpretation",
+        "ted_severity": "TED Severity (EUGOGO)",
+        "ted_severity_label": "TED Severity Label",
+        "proptosis": "Proptosis (mm)",
+        **{key: label for key, label in [
+            ("cas_spontaneous_pain", "CAS — Spontaneous pain"),
+            ("cas_gaze_pain", "CAS — Gaze pain"),
+            ("cas_eyelid_erythema", "CAS — Eyelid erythema"),
+            ("cas_eyelid_swelling", "CAS — Eyelid swelling"),
+            ("cas_conjunctival_redness", "CAS — Conjunctival redness"),
+            ("cas_chemosis", "CAS — Chemosis"),
+            ("cas_caruncle_inflammation", "CAS — Caruncle inflammation"),
+        ]},
     },
     "pituitary": {
         "fsh": "FSH",
@@ -114,6 +132,20 @@ TEMPLATE_SPECIFIC_LABELS: dict[str, dict[str, str]] = {
         "estradiol": "Estradiol",
         "amh": "AMH",
         "usg_pelvis": "USG Pelvis",
+        "ferriman_gallwey_total": "Modified Ferriman-Gallwey Score",
+        "fg_interpretation": "FG Interpretation",
+        "ludwig_grade": "Ludwig Alopecia Grade",
+        **{key: label for key, label in [
+            ("fg_upper_lip", "FG — Upper lip"),
+            ("fg_chin", "FG — Chin"),
+            ("fg_chest", "FG — Chest"),
+            ("fg_upper_abdomen", "FG — Upper abdomen"),
+            ("fg_lower_abdomen", "FG — Lower abdomen"),
+            ("fg_upper_back", "FG — Upper back"),
+            ("fg_lower_back", "FG — Lower back"),
+            ("fg_thighs", "FG — Thighs"),
+            ("fg_upper_arms", "FG — Upper arms"),
+        ]},
     },
     "adrenal": {
         "cortisol_8am": "8am Cortisol",
@@ -148,8 +180,6 @@ LAB_FIELD_MAP: dict[str, tuple[str, str | None, str | None]] = {
     "free_t4": ("Free T4", "ng/dL", "0.8–1.8"),
     "tpo_antibodies": ("TPO Antibodies", "IU/mL", "<35"),
     "tshr_ab": ("TSHR Ab", "IU/L", "<1.75"),
-    "proptosis": ("Proptosis", "mm", ""),
-    "cas_score": ("CAS Score", "", "0–7"),
     "fsh": ("FSH", "mIU/mL", "age-adjusted"),
     "lh": ("LH", "mIU/mL", "age-adjusted"),
     "prl": ("PRL", "ng/mL", "4–23"),
@@ -248,6 +278,8 @@ def get_template_field_list(template: str) -> list[dict]:
     specific_keys = set(TEMPLATE_SPECIFIC_LABELS.get(template, {}).keys())
     rows = []
     for key, label in labels.items():
+        if key in SCORING_ONLY_KEYS:
+            continue
         if key in specific_keys:
             rows.append({
                 "key": key, "label": label,

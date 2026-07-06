@@ -70,10 +70,20 @@ class AppointmentResponse(AppointmentCreate):
 class BillCreate(BaseModel):
     visit_id: int
     description: str
-    amount: float = Field(gt=0)
-    procedure_code: str | None = None
+    amount: float = Field(gt=0, description="Total amount in INR (inclusive of GST)")
+    base_amount: float | None = Field(default=None, gt=0)
+    gst_percent: float = Field(default=0, ge=0, le=28)
+    gst_amount: float = Field(default=0, ge=0)
+    procedure_code: str | None = Field(default=None, description="SAC/HSN code")
     payment_status: str = "pending"
     payment_method: str | None = None
+    invoice_number: str | None = None
+
+
+class BillUpdate(BaseModel):
+    payment_status: str | None = None
+    payment_method: str | None = None
+    description: str | None = None
 
 
 class BillResponse(BillCreate):

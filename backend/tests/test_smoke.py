@@ -152,6 +152,58 @@ def test_phase2_5_endpoints(headers):
     assert "egfr" in r.json()
     print(f"OK eGFR calculator — {r.json()['egfr']}")
 
+    r = client.post("/api/v1/calculators/prevent-ascvd", headers=headers, json={
+        "age": 50,
+        "sex": "Female",
+        "total_cholesterol": 200,
+        "hdl_cholesterol": 45,
+        "sbp": 160,
+        "on_antihypertensive": True,
+        "diabetes": True,
+        "smoker": False,
+        "egfr": 90,
+        "bmi": 35,
+        "on_statin": False,
+    })
+    assert r.status_code == 200, r.text
+    prevent = r.json()
+    assert prevent["model"] == "AHA PREVENT Base Model"
+    assert 8.5 <= prevent["ascvd_risk_10y"] <= 9.5
+    assert 34 <= prevent["ascvd_risk_30y"] <= 36
+    assert 14 <= prevent["total_cvd_risk_10y"] <= 15.5
+    print(f"OK PREVENT calculator — 10yr ASCVD: {prevent['ascvd_risk_10y']}%")
+
+    r = client.post("/api/v1/calculators/ferriman-gallwey", headers=headers, json={
+        "fg_upper_lip": 2, "fg_chin": 3, "fg_chest": 1,
+        "fg_upper_abdomen": 1, "fg_lower_abdomen": 0,
+        "fg_upper_back": 1, "fg_lower_back": 0,
+        "fg_thighs": 1, "fg_upper_arms": 0,
+        "ethnicity": "south_asian",
+    })
+    assert r.status_code == 200, r.text
+    fg = r.json()
+    assert fg["total"] == 9
+    assert fg["hyperandrogenism_criterion"] is True
+    print(f"OK Ferriman-Gallwey — total {fg['total']}")
+
+    r = client.get("/api/v1/billing/visit-options", headers=headers)
+    assert r.status_code == 200
+    visit_opts = r.json()
+    if visit_opts:
+        r = client.post("/api/v1/bills", headers=headers, json={
+            "visit_id": visit_opts[0]["visit_id"],
+            "description": "Test consultation",
+            "base_amount": 500,
+            "gst_percent": 0,
+            "gst_amount": 0,
+            "amount": 500,
+            "payment_status": "paid",
+            "payment_method": "UPI",
+        })
+        assert r.status_code == 201, r.text
+        assert r.json().get("invoice_number")
+        print(f"OK billing — invoice {r.json()['invoice_number']}")
+
     r = client.post("/api/v1/calculators/instruction-bilingual", headers=headers, json={
         "text": "Before Food. Take after meals with water",
     })

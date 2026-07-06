@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, Diagnosis, PatientDetail, TimelineData, VisitDetail } from '../api/client';
+import PcosScoringPanel from '../components/PcosScoringPanel';
+import ThyroidScoringPanel from '../components/ThyroidScoringPanel';
+import { mergePcosScoresIntoExamination } from '../utils/pcosExamination';
+import { mergeThyroidScoresIntoExamination } from '../utils/thyroidExamination';
 
 type TemplateField = {
   key: string;
@@ -247,27 +251,39 @@ export default function VisitForm() {
     setSpecialtyData(prev => (prev.rft_egfr === egfr ? prev : { ...prev, rft_egfr: egfr }));
   }, [specialtyData.rft_creatinine, patient]);
 
-  const buildPayload = useCallback(() => ({
-    ...form,
-    height: form.height ? Number(form.height) : null,
-    weight: form.weight ? Number(form.weight) : null,
-    mid_parental_height: form.mid_parental_height ? Number(form.mid_parental_height) : null,
-    bp_systolic: form.bp_systolic ? Number(form.bp_systolic) : null,
-    bp_diastolic: form.bp_diastolic ? Number(form.bp_diastolic) : null,
-    pulse: form.pulse ? Number(form.pulse) : null,
-    temperature: form.temperature ? Number(form.temperature) : null,
-    spo2: form.spo2 ? Number(form.spo2) : null,
-    follow_up_date: form.follow_up_date || null,
-    specialty_template: form.specialty_template || null,
-    specialty_data: form.specialty_template ? { condition: form.specialty_template, ...specialtyData } : null,
-    prevent_data: { inputs: preventForm, results: preventResult },
-  }), [form, specialtyData, preventForm, preventResult]);
+  const buildPayload = useCallback(() => {
+    let examination = form.examination;
+    if (form.specialty_template === 'pcos') {
+      examination = mergePcosScoresIntoExamination(examination, specialtyData);
+    }
+    if (form.specialty_template === 'thyroid') {
+      examination = mergeThyroidScoresIntoExamination(examination, specialtyData);
+    }
+    return {
+      ...form,
+      examination,
+      height: form.height ? Number(form.height) : null,
+      weight: form.weight ? Number(form.weight) : null,
+      mid_parental_height: form.mid_parental_height ? Number(form.mid_parental_height) : null,
+      bp_systolic: form.bp_systolic ? Number(form.bp_systolic) : null,
+      bp_diastolic: form.bp_diastolic ? Number(form.bp_diastolic) : null,
+      pulse: form.pulse ? Number(form.pulse) : null,
+      temperature: form.temperature ? Number(form.temperature) : null,
+      spo2: form.spo2 ? Number(form.spo2) : null,
+      follow_up_date: form.follow_up_date || null,
+      specialty_template: form.specialty_template || null,
+      specialty_data: form.specialty_template ? { condition: form.specialty_template, ...specialtyData } : null,
+      prevent_data: { inputs: preventForm, results: preventResult },
+    };
+  }, [form, specialtyData, preventForm, preventResult]);
 
   useEffect(() => {
     if (!isEdit || !editVisitId || !dirty) return;
     const timer = setTimeout(async () => {
       try {
-        await api.updateVisit(Number(editVisitId), buildPayload(), true);
+        const payload = buildPayload();
+        await api.updateVisit(Number(editVisitId), payload, true);
+        setForm(f => (f.examination !== payload.examination ? { ...f, examination: payload.examination } : f));
         setAutosaveMsg(`Draft saved ${new Date().toLocaleTimeString()}`);
         setDirty(false);
       } catch {
@@ -343,6 +359,8 @@ export default function VisitForm() {
       return;
     }
     setError('');
+    const bmiVal = preventForm.bmi ? Number(preventForm.bmi) : (computedBmi ?? null);
+    const egfrVal = preventForm.egfr ? Number(preventForm.egfr) : (specialtyData.rft_egfr ? Number(specialtyData.rft_egfr) : null);
     try {
       const r = await api.calcPreventAscvd({
         age,
@@ -354,8 +372,8 @@ export default function VisitForm() {
         diabetes: preventForm.diabetes,
         smoker: preventForm.smoker,
         on_statin: preventForm.on_statin,
-        egfr: preventForm.egfr ? Number(preventForm.egfr) : null,
-        bmi: preventForm.bmi ? Number(preventForm.bmi) : null,
+        egfr: egfrVal,
+        bmi: bmiVal,
       });
       setPreventResult(r);
       markDirty();
@@ -530,13 +548,30 @@ export default function VisitForm() {
                 {preventResult && (
                   <div className="alert alert-info mt-2 mb-0 small">
                     <strong>10-yr ASCVD:</strong> {String(preventResult.ascvd_risk_10y)}% ·{' '}
-                    <strong>30-yr ASCVD:</strong> {String(preventResult.ascvd_risk_30y)}% ·{' '}
+                    <strong>30-yr ASCVD:</strong>{' '}
+                    {preventResult.ascvd_risk_30y != null ? `${preventResult.ascvd_risk_30y}%` : 'N/A (age >59)'} ·{' '}
                     <strong>10-yr Total CVD:</strong> {String(preventResult.total_cvd_risk_10y)}% ·{' '}
                     <strong>Category:</strong> {String(preventResult.risk_category)}
                   </div>
                 )}
               </div>
             </div>
+            {form.specialty_template === 'pcos' && (
+              <div className="col-12 mb-3">
+                <PcosScoringPanel
+                  data={specialtyData}
+                  onChange={next => { setSpecialtyData(next); markDirty(); }}
+                />
+              </div>
+            )}
+            {form.specialty_template === 'thyroid' && (
+              <div className="col-12 mb-3">
+                <ThyroidScoringPanel
+                  data={specialtyData}
+                  onChange={next => { setSpecialtyData(next); markDirty(); }}
+                />
+              </div>
+            )}
             {fieldGroups.map(([groupLabel, fields]) => (
               <div className="col-12 mb-3" key={groupLabel}>
                 <div className="card bg-light p-3">
@@ -555,6 +590,12 @@ export default function VisitForm() {
                 <textarea className="form-control" rows={2}
                   value={form[f.key as keyof typeof form]}
                   onChange={e => { setForm({ ...form, [f.key]: e.target.value }); markDirty(); }} />
+                {f.key === 'examination' && (form.specialty_template === 'pcos' || form.specialty_template === 'thyroid') && (
+                  <div className="form-text">
+                    {form.specialty_template === 'pcos' && 'Ferriman-Gallwey and Ludwig scores are appended here automatically when you save.'}
+                    {form.specialty_template === 'thyroid' && 'WHO goitre, CAS, and TED severity grades are appended here automatically when you save.'}
+                  </div>
+                )}
               </div>
             ))}
             <div className="col-12 mb-3">

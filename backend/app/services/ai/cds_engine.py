@@ -58,6 +58,31 @@ def _apply_thyroid_rules(recs: list[dict], specialty: dict):
     if tsh and ft4 and tsh > 4.5 and ft4 < 0.8:
         _add(recs, "Thyroid", "high", "ATA", "Primary hypothyroidism pattern (high TSH, low FT4). Confirm and treat.")
 
+    who = specialty.get("who_goitre_grade")
+    if who == "2":
+        _add(recs, "Thyroid", "medium", "WHO", "WHO Grade 2 goitre — visible enlargement. Consider ultrasound and thyroid function assessment.")
+    elif who == "1":
+        _add(recs, "Thyroid", "low", "WHO", "WHO Grade 1 goitre — palpable only. Monitor and evaluate if symptomatic.")
+
+    cas_total = _template_value(specialty, "cas_total")
+    if cas_total is not None:
+        if cas_total >= 3:
+            _add(recs, "Thyroid", "high", "EUGOGO", f"CAS {cas_total:.0f}/7 — active thyroid eye disease. Consider anti-inflammatory therapy and specialist referral.")
+        elif cas_total > 0:
+            _add(recs, "Thyroid", "low", "EUGOGO", f"CAS {cas_total:.0f}/7 — currently inactive TED. Monitor clinically.")
+
+    ted = (specialty.get("ted_severity") or "").lower()
+    if ted == "sight_threatening":
+        _add(recs, "Thyroid", "high", "EUGOGO", "Sight-threatening thyroid eye disease — urgent ophthalmology/endocrine referral.")
+    elif ted == "moderate_severe":
+        _add(recs, "Thyroid", "high", "EUGOGO", "Moderate-to-severe TED — specialist assessment for immunosuppression or surgery.")
+    elif ted == "mild":
+        _add(recs, "Thyroid", "medium", "EUGOGO", "Mild TED — local measures, smoking cessation, euthyroid maintenance.")
+
+    proptosis = _template_value(specialty, "proptosis")
+    if proptosis is not None and proptosis >= 22:
+        _add(recs, "Thyroid", "medium", "EUGOGO", f"Proptosis {proptosis} mm — assess for significant exophthalmos.")
+
 
 def _apply_diabetes_rules(recs: list[dict], specialty: dict):
     hba1c = _template_value(specialty, "hba1c")
@@ -119,12 +144,22 @@ def _apply_pcos_rules(recs: list[dict], specialty: dict):
     fsh = _template_value(specialty, "fsh")
     testosterone = _template_value(specialty, "testosterone")
     amh = _template_value(specialty, "amh")
+    fg_total = _template_value(specialty, "ferriman_gallwey_total")
+    ludwig = specialty.get("ludwig_grade")
     if lh and fsh and fsh > 0 and lh / fsh >= 2:
         _add(recs, "PCOS", "medium", "Rotterdam Criteria", f"LH/FSH ratio {lh/fsh:.1f} — supports PCOS workup. Correlate with clinical hyperandrogenism and ovarian morphology.")
     if testosterone is not None and testosterone > 50:
         _add(recs, "PCOS", "medium", "Endocrine Society", f"Testosterone {testosterone} ng/dL elevated — assess hyperandrogenism.")
     if amh is not None and amh > 4.5:
         _add(recs, "PCOS", "low", "ESHRE", f"AMH {amh} ng/mL elevated — may support PCO morphology; interpret with age and assay.")
+    if fg_total is not None and fg_total >= 6:
+        _add(recs, "PCOS", "medium", "Rotterdam Criteria", f"Modified Ferriman-Gallwey score {fg_total:.0f}/36 — clinical hirsutism (hyperandrogenism criterion).")
+    elif fg_total is not None and fg_total < 6:
+        _add(recs, "PCOS", "low", "Rotterdam Criteria", f"Modified Ferriman-Gallwey score {fg_total:.0f}/36 — below South Asian hirsutism threshold.")
+    if ludwig in ("II", "III"):
+        _add(recs, "PCOS", "medium", "Rotterdam Criteria", f"Ludwig Grade {ludwig} androgenic alopecia — supports clinical hyperandrogenism.")
+    elif ludwig == "I":
+        _add(recs, "PCOS", "low", "Rotterdam Criteria", "Ludwig Grade I androgenic alopecia — mild crown thinning.")
 
 
 def get_cds_recommendations(db: Session, visit: Visit) -> list[dict]:

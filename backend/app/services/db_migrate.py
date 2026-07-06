@@ -38,3 +38,17 @@ def ensure_phase2_columns():
     if "date_of_birth" not in cols:
       with engine.begin() as conn:
         conn.execute(text("ALTER TABLE patient ADD COLUMN date_of_birth DATE"))
+  if "bill" in inspector.get_table_names():
+    cols = {c["name"] for c in inspector.get_columns("bill")}
+    stmts = []
+    if "base_amount" not in cols:
+      stmts.append("ALTER TABLE bill ADD COLUMN base_amount FLOAT")
+    if "gst_percent" not in cols:
+      stmts.append("ALTER TABLE bill ADD COLUMN gst_percent FLOAT DEFAULT 0")
+    if "gst_amount" not in cols:
+      stmts.append("ALTER TABLE bill ADD COLUMN gst_amount FLOAT DEFAULT 0")
+    if "invoice_number" not in cols:
+      stmts.append("ALTER TABLE bill ADD COLUMN invoice_number VARCHAR(30)")
+    with engine.begin() as conn:
+      for s in stmts:
+        conn.execute(text(s))
