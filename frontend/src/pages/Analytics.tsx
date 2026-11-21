@@ -20,6 +20,17 @@ export default function Analytics() {
     <div>
       <h2 className="mb-4"><i className="fas fa-chart-bar me-2"></i>Analytics & Reports</h2>
 
+      {data.practice && (
+        <div className="row mb-4">
+          <div className="col-md-4"><div className="card p-3 text-center"><h4>₹{data.practice.business.consultation_revenue.toFixed(0)}</h4><small>Consultation</small></div></div>
+          <div className="col-md-4"><div className="card p-3 text-center"><h4>₹{data.practice.business.pharmacy_turnover.toFixed(0)}</h4><small>Pharmacy</small></div></div>
+          <div className="col-md-4"><div className="card p-3 text-center"><h4>₹{data.practice.business.laboratory_revenue.toFixed(0)}</h4><small>Laboratory</small></div></div>
+          <div className="col-12 mt-2"><p className="text-muted small mb-0">{data.practice.business.revenue_note} {data.practice.business.pharmacy_margin_note}</p></div>
+          <div className="col-md-6 mt-3"><div className="card p-3">Average HbA1c {String(data.practice.clinical.average_hba1c ?? '—')}. {String(data.practice.clinical.target_note || '')}</div></div>
+          <div className="col-md-6 mt-3"><div className="card p-3">Today {data.practice.business.consultations_today} consultations. New this month {data.practice.business.new_patients_this_month}, returning {data.practice.business.returning_patients_this_month}.</div></div>
+        </div>
+      )}
+
       <div className="row mb-4">
         <div className="col-md-4"><div className="card p-3 text-center"><h4>₹{data.revenue_summary.total_billed.toFixed(0)}</h4><small className="text-muted">Total Revenue</small></div></div>
         <div className="col-md-4"><div className="card p-3 text-center"><h4 className="text-success">₹{data.revenue_summary.total_paid.toFixed(0)}</h4><small className="text-muted">Collected</small></div></div>

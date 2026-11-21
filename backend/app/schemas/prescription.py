@@ -33,6 +33,10 @@ class PrescriptionResponse(BaseModel):
     instructions: str | None
     warnings: str | None
     created_at: datetime
+    prescribed_quantity: float | None = None
+    dispensed_quantity: float | None = None
+    dispense_status: str | None = None
+    dispense_note: str | None = None
     drug_name: str | None = None
     generic_name: str | None = None
     formatted_dosage: str | None = None

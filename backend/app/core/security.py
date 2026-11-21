@@ -1,3 +1,4 @@
+import secrets
 from datetime import datetime, timedelta, timezone
 
 from jose import JWTError, jwt
@@ -25,13 +26,17 @@ def create_access_token(subject: str) -> str:
     )
 
 
-def create_refresh_token(subject: str) -> str:
+def create_refresh_token(subject: str, jti: str) -> str:
     expire = datetime.now(timezone.utc) + timedelta(days=settings.refresh_token_expire_days)
     return jwt.encode(
-        {"sub": subject, "type": "refresh", "exp": expire},
+        {"sub": subject, "type": "refresh", "jti": jti, "exp": expire},
         settings.jwt_secret,
         algorithm=settings.jwt_algorithm,
     )
+
+
+def new_refresh_jti() -> str:
+    return secrets.token_urlsafe(24)
 
 
 def decode_token(token: str) -> dict | None:

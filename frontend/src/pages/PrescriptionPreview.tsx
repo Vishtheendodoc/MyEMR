@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, PdfLayout, VisitDetail } from '../api/client';
+import { formatClinicDate } from '../utils/clinicTime';
 
 type PreviewMode = 'pdf' | 'html';
 
@@ -167,6 +168,17 @@ export default function PrescriptionPreview() {
     a.click();
   };
 
+  const sendWhatsApp = async () => {
+    setError('');
+    try {
+      const result = await api.whatsappPrescription(visitId);
+      if (result.whatsapp_url) window.open(result.whatsapp_url, '_blank');
+      else setError('WhatsApp link not available for this patient.');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'WhatsApp failed');
+    }
+  };
+
   const handlePrint = () => {
     if (mode === 'pdf' && iframeRef.current?.contentWindow) {
       try {
@@ -197,7 +209,7 @@ export default function PrescriptionPreview() {
         <p className="text-muted mb-0">
           <strong>Patient:</strong> {visit.patient_name}
           {' | '}
-          <strong>Visit:</strong> {new Date(visit.visit_date).toLocaleDateString()}
+          <strong>Visit:</strong> {formatClinicDate(visit.visit_date)}
           {visit.pdf_page_count != null && (
             <span className="badge bg-info ms-2">
               {visit.pdf_page_count} page{visit.pdf_page_count !== 1 ? 's' : ''}
@@ -288,6 +300,9 @@ export default function PrescriptionPreview() {
             </button>
             <button type="button" className="btn btn-sm btn-warning" onClick={handlePrint}>
               <i className="fas fa-print me-1"></i>Print
+            </button>
+            <button type="button" className="btn btn-sm btn-success" onClick={sendWhatsApp}>
+              <i className="fab fa-whatsapp me-1"></i>WhatsApp Rx
             </button>
           </div>
         </div>

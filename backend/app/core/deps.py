@@ -28,9 +28,17 @@ def get_current_user(
 
 
 def require_role(*roles: str):
+    """Allow listed roles; doctor always has access."""
     def checker(user: User = Depends(get_current_user)) -> User:
-        if user.role not in roles:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
-        return user
-
+        if user.role == "doctor" or user.role in roles:
+            return user
+        if user.role == "nurse" and not roles:
+            return user
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
     return checker
+
+
+def require_any_staff(user: User = Depends(get_current_user)) -> User:
+    if user.role not in ("doctor", "nurse", "registration", "billing", "pharmacy", "admin"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
+    return user

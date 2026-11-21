@@ -33,12 +33,31 @@ def seed_extensions_if_missing(db: Session):
     visit1 = visits[0] if visits else None
 
     today = date.today()
+    d90, d60, d30, d14, d0 = (
+        today - timedelta(days=90),
+        today - timedelta(days=60),
+        today - timedelta(days=30),
+        today - timedelta(days=14),
+        today,
+    )
     labs = [
-        LabResult(patient_id=p1.id, visit_id=visit1.id if visit1 else None, test_name="HbA1c", value="8.5", unit="%", reference_range="4.0-5.6", result_date=today - timedelta(days=90)),
-        LabResult(patient_id=p1.id, test_name="HbA1c", value="7.8", unit="%", reference_range="4.0-5.6", result_date=today - timedelta(days=30)),
-        LabResult(patient_id=p1.id, test_name="eGFR", value="45", unit="mL/min", reference_range=">60", result_date=today - timedelta(days=30)),
-        LabResult(patient_id=p1.id, test_name="TSH", value="2.1", unit="mIU/L", reference_range="0.4-4.5", result_date=today - timedelta(days=60)),
-        LabResult(patient_id=p1.id, test_name="Fasting Glucose", value="142", unit="mg/dL", reference_range="70-100", result_date=today - timedelta(days=14)),
+        LabResult(patient_id=p1.id, visit_id=visit1.id if visit1 else None, test_name="HbA1c", value="8.5", unit="%", reference_range="4.0-5.6", result_date=d90),
+        LabResult(patient_id=p1.id, test_name="HbA1c", value="8.1", unit="%", reference_range="4.0-5.6", result_date=d60),
+        LabResult(patient_id=p1.id, test_name="HbA1c", value="7.8", unit="%", reference_range="4.0-5.6", result_date=d30),
+        LabResult(patient_id=p1.id, test_name="HbA1c", value="7.2", unit="%", reference_range="4.0-5.6", result_date=d0),
+        LabResult(patient_id=p1.id, test_name="eGFR", value="52", unit="mL/min", reference_range=">60", result_date=d90),
+        LabResult(patient_id=p1.id, test_name="eGFR", value="48", unit="mL/min", reference_range=">60", result_date=d60),
+        LabResult(patient_id=p1.id, test_name="eGFR", value="45", unit="mL/min", reference_range=">60", result_date=d30),
+        LabResult(patient_id=p1.id, test_name="eGFR", value="47", unit="mL/min", reference_range=">60", result_date=d0),
+        LabResult(patient_id=p1.id, test_name="TSH", value="2.8", unit="mIU/L", reference_range="0.4-4.5", result_date=d90),
+        LabResult(patient_id=p1.id, test_name="TSH", value="2.1", unit="mIU/L", reference_range="0.4-4.5", result_date=d60),
+        LabResult(patient_id=p1.id, test_name="TSH", value="1.9", unit="mIU/L", reference_range="0.4-4.5", result_date=d30),
+        LabResult(patient_id=p1.id, test_name="FT4", value="1.1", unit="ng/dL", reference_range="0.8-1.8", result_date=d60),
+        LabResult(patient_id=p1.id, test_name="FT4", value="1.2", unit="ng/dL", reference_range="0.8-1.8", result_date=d30),
+        LabResult(patient_id=p1.id, test_name="Creatinine", value="1.4", unit="mg/dL", reference_range="0.6-1.2", result_date=d90),
+        LabResult(patient_id=p1.id, test_name="Creatinine", value="1.5", unit="mg/dL", reference_range="0.6-1.2", result_date=d30),
+        LabResult(patient_id=p1.id, test_name="Fasting Glucose", value="142", unit="mg/dL", reference_range="70-100", result_date=d14),
+        LabResult(patient_id=p1.id, test_name="Fasting Glucose", value="128", unit="mg/dL", reference_range="70-100", result_date=d0),
     ]
     db.add_all(labs)
 

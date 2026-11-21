@@ -5,7 +5,7 @@ import re
 
 from sqlalchemy.orm import Session
 
-from app.models import LabResult, Prescription, Visit
+from app.models import LabResult, Patient, Prescription, Visit
 from app.services.clinical_safety import check_drug_comorbidity_interactions
 from app.services.prescription_utils import format_prescription_drug_name
 from app.services.specialty_templates import parse_specialty_data
@@ -19,11 +19,22 @@ def _parse_float(value: str | None) -> float | None:
 
 
 def _latest_lab(db: Session, patient_id: int, test_names: list[str]) -> LabResult | None:
-    q = db.query(LabResult).filter(LabResult.patient_id == patient_id)
-    for name in test_names:
-        result = q.filter(LabResult.test_name.ilike(f"%{name}%")).order_by(LabResult.result_date.desc()).first()
-        if result:
-            return result
+    from app.services.patient_360 import canonical_code
+
+    wanted = {code for name in test_names if (code := canonical_code(name))}
+    rows = (
+        db.query(LabResult)
+        .filter(LabResult.patient_id == patient_id)
+        .order_by(LabResult.result_date.desc(), LabResult.id.desc())
+        .all()
+    )
+    for row in rows:
+        code = canonical_code(row.test_name)
+        if code and code in wanted:
+            return row
+        lowered = (row.test_name or "").lower()
+        if any(name.lower() in lowered for name in test_names):
+            return row
     return None
 
 
@@ -198,8 +209,22 @@ def get_cds_recommendations(db: Session, visit: Visit) -> list[dict]:
     if "diabetes" in diagnosis and visit.bmi and visit.bmi >= 30:
         _add(recommendations, "Obesity", "medium", "ADA", f"BMI {visit.bmi} with diabetes — consider GLP-1 agonist or SGLT2i.")
 
+    patient = db.get(Patient, visit.patient_id)
+    allergy_text = (patient.allergies if patient else None) or ""
+    allergy_tokens = [a.strip().lower() for a in re.split(r"[,;/|\n]+", allergy_text) if a.strip()]
+
     prescriptions = db.query(Prescription).filter_by(visit_id=visit.id).all()
     for rx in prescriptions:
+        drug_label = format_prescription_drug_name(rx).lower()
+        for allergy in allergy_tokens:
+            if allergy and allergy in drug_label:
+                _add(
+                    recommendations,
+                    "Allergy",
+                    "high",
+                    "Patient chart",
+                    f"Possible allergy conflict: patient listed '{allergy}' and Rx includes {format_prescription_drug_name(rx)}.",
+                )
         if rx.brand_medication and comorbidities:
             for w in check_drug_comorbidity_interactions(db, rx.brand_medication.generic_drug_id, comorbidities):
                 _add(recommendations, "Drug Safety", w.get("severity") or "medium", "Formulary Rules",

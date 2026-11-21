@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, CdsRecommendation, VisitDetail } from '../api/client';
+import { formatClinicDate, formatClinicDateTime } from '../utils/clinicTime';
+import { followUpNotesForDisplay } from '../utils/followUpNotes';
 
 export default function VisitDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +19,8 @@ export default function VisitDetailPage() {
   useEffect(() => { load(); }, [id]);
 
   if (!visit) return <div>Loading...</div>;
+
+  const followUpNotes = followUpNotesForDisplay(visit.follow_up_notes, visit.follow_up_date);
 
   const hasInvestigations = Boolean(visit.investigations_text?.trim());
   const hasMedications = visit.prescriptions.length > 0;
@@ -104,7 +108,7 @@ export default function VisitDetailPage() {
 
       <div className="card mb-4 p-3">
         <div className="row">
-          <div className="col-md-3"><strong>Date:</strong> {new Date(visit.visit_date).toLocaleString()}</div>
+          <div className="col-md-3"><strong>Date:</strong> {formatClinicDateTime(visit.visit_date)}</div>
           <div className="col-md-3"><strong>Type:</strong> {visit.visit_type}</div>
           <div className="col-md-3"><strong>MRD:</strong> {visit.patient_mrd || '-'}</div>
           {visit.bmi && <div className="col-md-3"><strong>BMI:</strong> {visit.bmi}</div>}
@@ -188,18 +192,16 @@ export default function VisitDetailPage() {
         </div>
       </div>
 
-      {(visit.follow_up_date || visit.follow_up_notes) && (
+      {(visit.follow_up_date || followUpNotes) && (
         <div className="card mt-4 p-3">
           <h6 className="mb-2">Follow-up</h6>
           {visit.follow_up_date && (
             <p className="mb-1">
               <strong>Next Visit:</strong>{' '}
-              {new Date(`${visit.follow_up_date}T12:00:00`).toLocaleDateString('en-GB', {
-                day: 'numeric', month: 'long', year: 'numeric',
-              })}
+              {formatClinicDate(visit.follow_up_date)}
             </p>
           )}
-          {visit.follow_up_notes && <p className="mb-0"><strong>Notes:</strong> {visit.follow_up_notes}</p>}
+          {followUpNotes && <p className="mb-0"><strong>Notes:</strong> {followUpNotes}</p>}
         </div>
       )}
 

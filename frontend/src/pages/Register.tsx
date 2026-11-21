@@ -26,8 +26,12 @@ export default function Register() {
 
   return (
     <div className="auth-page">
-      <div className="card p-4" style={{ width: '100%', maxWidth: 480 }}>
-        <h3 className="text-center text-primary mb-4">Register</h3>
+      <div className="auth-card" style={{ maxWidth: 480 }}>
+        <div className="text-center mb-4">
+          <div className="brand-mark"><i className="fas fa-user-md"></i></div>
+          <h3 className="brand-display mb-1">Create account</h3>
+          <p className="text-muted mb-0">A new doctor gets a separate clinic setup. Desk staff can switch between doctors.</p>
+        </div>
         {error && <div className="alert alert-danger">{error}</div>}
         <form onSubmit={handleSubmit}>
           {(['email', 'display_name', 'password', 'qualifications', 'kmc_number'] as const).map(field => (

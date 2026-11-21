@@ -6,6 +6,8 @@ import math
 import re
 from datetime import date, datetime
 
+from app.services.clinic_time import clinic_day
+
 # (age_months, median_cm, sd_cm) — CDC length/stature reference (approx.)
 BOYS_INFANT: list[tuple[int, float, float]] = [
     (0, 49.9, 1.9), (1, 54.7, 2.0), (2, 58.4, 2.1), (3, 61.4, 2.1), (4, 64.0, 2.1),
@@ -66,7 +68,7 @@ def is_female(sex: str | None) -> bool:
 
 def age_at_visit(patient_age_years: float, visit_date: datetime, reference: date | None = None) -> float:
     ref = reference or date.today()
-    vdate = visit_date.date() if isinstance(visit_date, datetime) else visit_date
+    vdate = clinic_day(visit_date) if isinstance(visit_date, datetime) else visit_date
     elapsed_years = max(0.0, (ref - vdate).days / 365.25)
     return max(0.0, patient_age_years - elapsed_years)
 
@@ -169,7 +171,7 @@ def growth_chart_data(
         age_months = age_y * 12
         chart = "infant" if age_months <= 24 else "child"
         point = {
-            "date": visit.visit_date.date().isoformat(),
+            "date": clinic_day(visit.visit_date).isoformat(),
             "age_years": round(age_y, 2),
             "age_months": round(age_months, 1),
             "height_cm": visit.height,

@@ -31,6 +31,7 @@ def seed_if_empty(db: Session):
         role="doctor",
         qualifications="MBBS, MD (Endocrinology)",
         kmc_number="KMC-12345",
+        clinic_id=1,
     )
     db.add(user)
     db.flush()
@@ -91,7 +92,7 @@ def seed_if_empty(db: Session):
     ]
     patients = []
     for pdata in patients_data:
-        p = Patient(doctor_id=user.id, **pdata)
+        p = Patient(doctor_id=user.id, clinic_id=1, **pdata)
         db.add(p)
         db.flush()
         patients.append(p)

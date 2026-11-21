@@ -9,6 +9,12 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 7
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
     seed_on_startup: bool = False
+    clinic_name: str = "Endo Clinic"
+    public_base_url: str = ""  # Optional address patients can open, such as https://clinic.example.com
+    # Optional Twilio WhatsApp Business API (auto-send). Without these, app uses wa.me deep links.
+    twilio_account_sid: str = ""
+    twilio_auth_token: str = ""
+    twilio_whatsapp_from: str = ""  # e.g. whatsapp:+14155238886
 
     @property
     def sqlalchemy_database_url(self) -> str:

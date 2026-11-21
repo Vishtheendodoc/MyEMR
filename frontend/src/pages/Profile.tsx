@@ -18,10 +18,14 @@ export default function Profile() {
     }
   }, [user]);
 
+  const doctor = user?.role === 'doctor';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setMessage('');
     try {
-      await api.updateProfile(form);
+      await api.updateProfile(doctor ? form : { display_name: form.display_name });
       await refreshUser();
       setMessage('Profile updated successfully.');
     } catch (err) {
@@ -39,13 +43,22 @@ export default function Profile() {
         <p><strong>Role:</strong> {user?.role}</p>
         <hr />
         <form onSubmit={handleSubmit}>
-          {(['display_name', 'qualifications', 'kmc_number'] as const).map(f => (
-            <div className="mb-3" key={f}>
-              <label className="form-label text-capitalize">{f.replace('_', ' ')}</label>
-              <input className="form-control" required={f === 'display_name'}
-                value={form[f]} onChange={e => setForm({ ...form, [f]: e.target.value })} />
-            </div>
-          ))}
+          <div className="mb-3">
+            <label className="form-label">Display name</label>
+            <input className="form-control" required value={form.display_name} onChange={e => setForm({ ...form, display_name: e.target.value })} />
+          </div>
+          {doctor && (
+            <>
+              <div className="mb-3">
+                <label className="form-label">Qualifications</label>
+                <input className="form-control" value={form.qualifications} onChange={e => setForm({ ...form, qualifications: e.target.value })} />
+              </div>
+              <div className="mb-3">
+                <label className="form-label">KMC number</label>
+                <input className="form-control" value={form.kmc_number} onChange={e => setForm({ ...form, kmc_number: e.target.value })} />
+              </div>
+            </>
+          )}
           <button type="submit" className="btn btn-primary">Update Profile</button>
         </form>
       </div>

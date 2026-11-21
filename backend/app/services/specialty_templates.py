@@ -1,5 +1,6 @@
 """Specialty visit templates: field definitions, lab sync, diagnosis matching."""
 
+import re
 from datetime import date
 
 from sqlalchemy.orm import Session
@@ -162,6 +163,39 @@ TEMPLATE_SPECIFIC_LABELS: dict[str, dict[str, str]] = {
         "vitamin_d": "Vitamin D",
         "pth": "PTH",
         "dxa_t_score": "DEXA T-score",
+        "dxa_z_score": "DEXA Z-score",
+        "frax_major": "FRAX major osteoporotic %",
+        "frax_hip": "FRAX hip fracture %",
+        "fracture_history": "Fracture history",
+        "therapy_duration": "Bone therapy and duration",
+        "drug_holiday": "Drug holiday",
+    },
+    "diabetic_foot": {
+        "foot_monofilament": "10 g monofilament",
+        "foot_pulses": "Foot pulses",
+        "foot_ulcer_grade": "Ulcer grade",
+        "foot_risk": "Risk category",
+        "foot_deformity": "Deformity",
+        "foot_wound_notes": "Wound notes",
+    },
+    "gestational": {
+        "gestational_age_weeks": "Gestational age (weeks)",
+        "gdm_fasting": "Fasting glucose",
+        "gdm_postmeal": "Post-meal glucose",
+        "insulin_plan": "Insulin plan",
+        "delivery_outcome": "Delivery outcome",
+        "neonatal_outcome": "Neonatal outcome",
+    },
+    "pediatric": {
+        "tanner_stage": "Pubertal stage",
+        "bone_age": "Bone age",
+        "growth_note": "Growth note",
+    },
+    "obesity": {
+        "weight_goal_kg": "Weight goal (kg)",
+        "body_composition": "Body composition",
+        "obesity_therapy": "Therapy",
+        "side_effects": "Side effects",
     },
 }
 
@@ -217,6 +251,8 @@ LAB_FIELD_MAP: dict[str, tuple[str, str | None, str | None]] = {
     "lipid_hdl": ("HDL", "mg/dL", ">40"),
     "lipid_tg": ("Triglycerides", "mg/dL", "<150"),
     "lipid_vldl": ("VLDL", "mg/dL", "5–40"),
+    "gdm_fasting": ("FBS", "mg/dL", "70–100"),
+    "gdm_postmeal": ("PPBS", "mg/dL", "<140"),
     "urine_appearance": ("Urine Appearance", "", ""),
     "urine_protein": ("Urine Protein", "", "Negative"),
     "urine_glucose": ("Urine Glucose", "", "Negative"),
@@ -239,6 +275,9 @@ IMAGING_FIELD_MAP: dict[str, str] = {
 # Textarea / free-text fields
 TEXTAREA_FIELDS = {
     "other_investigations", "usg_pelvis", "urine_appearance",
+    "fracture_history", "therapy_duration", "drug_holiday", "foot_wound_notes",
+    "insulin_plan", "delivery_outcome", "neonatal_outcome", "growth_note",
+    "body_composition", "obesity_therapy", "side_effects",
 }
 
 DIAGNOSIS_KEYWORDS: dict[str, list[str]] = {
@@ -247,7 +286,11 @@ DIAGNOSIS_KEYWORDS: dict[str, list[str]] = {
     "pituitary": ["pituitary", "prolactinoma", "acromegaly", "growth hormone", "gh deficiency", "microadenoma"],
     "pcos": ["pcos", "pmos", "polycystic", "ovarian syndrome", "hirsutism", "oligomenorrhea"],
     "adrenal": ["adrenal", "cushing", "addison", "pheochromocytoma", "hyperaldosteronism", "congenital adrenal"],
-    "bone": ["osteoporosis", "osteopenia", "vitamin d", "hyperparathyroid", "bone metabolic", "dxa"],
+    "bone": ["osteoporosis", "osteopenia", "vitamin d", "hyperparathyroid", "bone metabolic", "dxa", "frax"],
+    "diabetic_foot": ["diabetic foot", "foot ulcer", "neuropathy foot", "charcot"],
+    "gestational": ["gestational", "gdm", "pregnancy diabetes", "antenatal glucose"],
+    "pediatric": ["pediatric", "short stature", "puberty", "precocious", "delayed puberty"],
+    "obesity": ["obesity", "overweight", "bariatric", "weight loss"],
 }
 
 
@@ -321,6 +364,155 @@ def suggest_template_from_diagnosis(diagnosis: str) -> str | None:
     return max(scores, key=scores.get)
 
 
+_RESULT_LINE = re.compile(
+    r"^\s*(?P<name>[A-Za-z][A-Za-z0-9 /().+\-]{0,40}?)\s*[:\-]?\s*(?P<value><?\s*-?\d+(?:\.\d+)?)\s*(?P<unit>[%A-Za-zµμ/^0-9.]*)\s*$"
+)
+_FROM_VISIT = "From visit"
+
+
+def investigation_results(text: str | None) -> list[tuple[str, str, str | None, str | None]]:
+    """Known results written as their own line, such as 'HbA1c 7.2'."""
+    from app.services.patient_360 import PARAM_BY_CODE, canonical_code
+
+    found: list[tuple[str, str, str | None, str | None]] = []
+    for raw in (text or "").splitlines():
+        line = raw.strip()
+        if not line or len(line) > 80:
+            continue
+        match = _RESULT_LINE.match(line)
+        if not match:
+            continue
+        code = canonical_code(match.group("name"))
+        spec = PARAM_BY_CODE.get(code or "")
+        if spec is None:
+            continue
+        unit = (match.group("unit") or "").strip() or spec.unit
+        value = re.sub(r"\s+", "", match.group("value"))
+        found.append((spec.name, value, unit, spec.reference_range))
+    return found
+
+
+def reflect_visit_labs(db: Session, visit) -> int:
+    """Write visit template values and result lines onto the shared lab list.
+
+    Saving the same visit again updates those rows. A result entered on the labs
+    page is left as it is.
+    """
+    from app.services.clinic_time import clinic_day
+    from app.services.observation_sync import remove_sourced_observations
+
+    specialty_data = parse_specialty_data(visit.specialty_data)
+    result_day = clinic_day(visit.visit_date) if visit.visit_date else date.today()
+    desired: dict[str, tuple[str, str | None, str | None]] = {}
+    for test_name, value, unit, ref in investigation_results(visit.investigation):
+        desired[test_name] = (value, unit, ref)
+    for key, raw in specialty_data.items():
+        if key not in LAB_FIELD_MAP or raw is None or not str(raw).strip():
+            continue
+        test_name, unit, ref = LAB_FIELD_MAP[key]
+        desired[test_name] = (str(raw).strip(), unit or None, ref or None)
+
+    existing = (
+        db.query(LabResult)
+        .filter_by(patient_id=visit.patient_id, visit_id=visit.id)
+        .order_by(LabResult.id.asc())
+        .all()
+    )
+    grouped: dict[str, list[LabResult]] = {}
+    for lab in existing:
+        grouped.setdefault(lab.test_name, []).append(lab)
+
+    changes = 0
+    for test_name, (value, unit, ref) in desired.items():
+        rows = grouped.get(test_name, [])
+        managed = [row for row in rows if (row.notes or "").startswith(_FROM_VISIT)]
+        if managed:
+            row = managed[-1]
+            if row.value != value or row.unit != unit or row.reference_range != ref or row.result_date != result_day:
+                row.value = value
+                row.unit = unit
+                row.reference_range = ref
+                row.result_date = result_day
+                row.notes = _FROM_VISIT
+                changes += 1
+            for extra in managed[:-1]:
+                remove_sourced_observations(db, "lab_result", extra.id)
+                db.delete(extra)
+                changes += 1
+        elif not rows:
+            db.add(LabResult(
+                patient_id=visit.patient_id,
+                visit_id=visit.id,
+                test_name=test_name,
+                value=value,
+                unit=unit,
+                reference_range=ref,
+                result_date=result_day,
+                notes=_FROM_VISIT,
+            ))
+            changes += 1
+
+    for test_name, rows in grouped.items():
+        if test_name in desired:
+            continue
+        for row in rows:
+            if (row.notes or "").startswith(_FROM_VISIT):
+                remove_sourced_observations(db, "lab_result", row.id)
+                db.delete(row)
+                changes += 1
+
+    imaging_desired: dict[str, str] = {}
+    for key, raw in specialty_data.items():
+        if key in IMAGING_FIELD_MAP and raw is not None and str(raw).strip():
+            imaging_desired[IMAGING_FIELD_MAP[key]] = str(raw).strip()
+    for study, findings in imaging_desired.items():
+        images = (
+            db.query(ImagingResult)
+            .filter_by(patient_id=visit.patient_id, visit_id=visit.id, study_type=study)
+            .order_by(ImagingResult.id.asc())
+            .all()
+        )
+        if images:
+            current = images[-1]
+            if current.findings != findings or current.report_date != result_day:
+                current.findings = findings
+                current.report_date = result_day
+                changes += 1
+            for extra in images[:-1]:
+                db.delete(extra)
+                changes += 1
+        else:
+            db.add(ImagingResult(
+                patient_id=visit.patient_id,
+                visit_id=visit.id,
+                study_type=study,
+                findings=findings,
+                report_date=result_day,
+            ))
+            changes += 1
+    return changes
+
+
+def reflect_stored_visit_labs(db: Session) -> int:
+    """Copy results already written on visits into the shared lab list. Safe to repeat."""
+    from app.models import Visit
+    from app.services.observation_sync import sync_visit_observations
+
+    total = 0
+    touched = []
+    for visit in db.query(Visit).all():
+        count = reflect_visit_labs(db, visit)
+        if count:
+            touched.append(visit)
+            total += count
+    for visit in touched:
+        db.flush()
+        sync_visit_observations(db, visit)
+    if total:
+        db.commit()
+    return total
+
+
 def sync_template_to_labs(
     db: Session,
     patient_id: int,
@@ -328,41 +520,16 @@ def sync_template_to_labs(
     template: str | None,
     specialty_data: dict | None,
 ) -> int:
-    if not template or not specialty_data:
+    from app.models import Visit
+
+    visit = db.get(Visit, visit_id)
+    if visit is None:
         return 0
-
-    created = 0
-    today = date.today()
-
-    for key, raw in specialty_data.items():
-        if key == "condition" or key.startswith("_") or not raw or not str(raw).strip():
-            continue
-        value = str(raw).strip()
-
-        if key in LAB_FIELD_MAP:
-            test_name, unit, ref = LAB_FIELD_MAP[key]
-            db.add(LabResult(
-                patient_id=patient_id,
-                visit_id=visit_id,
-                test_name=test_name,
-                value=value,
-                unit=unit or None,
-                reference_range=ref or None,
-                result_date=today,
-                notes=f"From {template} visit template",
-            ))
-            created += 1
-        elif key in IMAGING_FIELD_MAP:
-            db.add(ImagingResult(
-                patient_id=patient_id,
-                visit_id=visit_id,
-                study_type=IMAGING_FIELD_MAP[key],
-                findings=value,
-                report_date=today,
-            ))
-            created += 1
-
-    return created
+    if specialty_data is not None:
+        import json
+        visit.specialty_data = json.dumps(specialty_data)
+        visit.specialty_template = template
+    return reflect_visit_labs(db, visit)
 
 
 def parse_specialty_data(raw: str | None) -> dict:

@@ -1,11 +1,13 @@
 import os
-from datetime import datetime
+import re
+from datetime import date, datetime
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from weasyprint import HTML
 
 from app.models import Prescription
+from app.services.clinic_time import format_clinic_stamp
 from app.services.specialty_templates import build_prescription_investigations
 from app.services.prescription_utils import (
     format_prescription_dosage,
@@ -60,6 +62,35 @@ def get_visit_prescriptions(db, visit_id):
     return db.query(Prescription).filter_by(visit_id=visit_id).all()
 
 
+_REVIEW_ON = re.compile(r"^review on\s+(.+)$", re.IGNORECASE)
+
+
+def _same_follow_up_day(raw: str, follow_up_date: date | None) -> bool:
+    if follow_up_date is None:
+        return False
+    cleaned = re.sub(r"\s+", " ", raw.replace(",", " ")).strip()
+    for fmt in ("%d %B %Y", "%d %b %Y", "%B %d %Y", "%b %d %Y", "%d/%m/%Y", "%d-%m-%Y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(cleaned, fmt).date() == follow_up_date
+        except ValueError:
+            continue
+    return False
+
+
+def display_follow_up_notes(notes: str | None, follow_up_date: date | None) -> str:
+    """Drop a notes line that only repeats the printed next-visit date."""
+    kept = []
+    for line in (notes or "").splitlines():
+        text = line.strip()
+        if not text:
+            continue
+        match = _REVIEW_ON.match(text)
+        if match and _same_follow_up_day(match.group(1), follow_up_date):
+            continue
+        kept.append(text)
+    return "\n".join(kept)
+
+
 def render_prescription_html(
     visit, patient, prescriptions, doctor, preview=False,
     font_size=DEFAULT_FONT_SIZE, line_height=LINE_HEIGHTS[0],
@@ -72,6 +103,17 @@ def render_prescription_html(
     left_margin = clamp_left_margin(left_margin)
     template = _jinja_env.get_template("prescription.html")
     investigations_text = build_prescription_investigations(visit)
+    clinic = {"name": "Endo Clinic", "address": "", "phone": "", "gstin": "", "signatory": "", "signature_data": ""}
+    try:
+        from app.api.v1.clinic_admin import letterhead
+        from app.core.database import SessionLocal
+        db = SessionLocal()
+        try:
+            clinic = letterhead(db, getattr(doctor, "clinic_id", None) or 1)
+        finally:
+            db.close()
+    except Exception:
+        pass
     return template.render(
         visit=visit,
         patient=patient,
@@ -85,6 +127,9 @@ def render_prescription_html(
         hide_patient_info=hide_patient_info,
         hide_header=hide_header,
         investigations_text=investigations_text,
+        follow_up_notes_text=display_follow_up_notes(getattr(visit, "follow_up_notes", None), getattr(visit, "follow_up_date", None)),
+        visit_stamp=format_clinic_stamp(getattr(visit, "visit_date", None)),
+        clinic=clinic,
         format_prescription_drug_name=format_prescription_drug_name,
         format_prescription_generic_name=format_prescription_generic_name,
         format_prescription_dosage=format_prescription_dosage,

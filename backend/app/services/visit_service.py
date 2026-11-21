@@ -59,6 +59,7 @@ def apply_visit_fields(visit: Visit, data, *, autosave: bool = False):
     visit.examination = data.examination
     visit.diagnosis = data.diagnosis
     visit.investigation = data.investigation
+    visit.ordered_investigations = data.ordered_investigations
     visit.comorbidities = data.comorbidities
     visit.follow_up_date = data.follow_up_date
     visit.follow_up_notes = data.follow_up_notes

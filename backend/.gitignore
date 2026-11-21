@@ -1,5 +1,6 @@
 emr.db
 test_emr.db
+test_commerce.db
 __pycache__/
 *.pyc
 .env

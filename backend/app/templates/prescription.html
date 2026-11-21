@@ -263,12 +263,16 @@
 
     {% if not hide_header %}
     <div class="header">
-        <h1>MEDICAL PRESCRIPTION</h1>
+        <h1>{{ clinic.name if clinic else 'Clinic' }}</h1>
         {% if visit.status != 'locked' %}
         <p class="draft-badge">Draft — Not Finalized</p>
         {% endif %}
-        <p><strong>Endocrinology Department</strong></p>
-        <p>Date: {{ visit.visit_date.strftime('%d %B, %Y') }}</p>
+        {% if clinic and clinic.address %}<p>{{ clinic.address }}</p>{% endif %}
+        <p>
+          {% if clinic and clinic.phone %}{{ clinic.phone }}{% endif %}
+          {% if clinic and clinic.gstin %} · GSTIN {{ clinic.gstin }}{% endif %}
+        </p>
+        <p>Date: {{ visit_stamp }}</p>
     </div>
     {% elif visit.status != 'locked' %}
     <p class="draft-badge">Draft — Not Finalized</p>
@@ -408,20 +412,23 @@
     </div>
     {% endif %}
 
-    {% if visit.follow_up_date or visit.follow_up_notes %}
+    {% if visit.follow_up_date or follow_up_notes_text %}
     <div class="section follow-up">
         <h3>Follow-up</h3>
         {% if visit.follow_up_date %}
         <p><strong>Next Visit:</strong> {{ visit.follow_up_date.strftime('%d %B, %Y') }}</p>
         {% endif %}
-        {% if visit.follow_up_notes %}
-        <p><strong>Notes:</strong> {{ visit.follow_up_notes }}</p>
+        {% if follow_up_notes_text %}
+        <p><strong>Notes:</strong> {{ follow_up_notes_text }}</p>
         {% endif %}
     </div>
     {% endif %}
 
     <div class="doctor-footer">
-        <p><strong>Dr. {{ doctor.doctor_name }}</strong></p>
+        {% if clinic and clinic.signature_data %}
+        <img src="{{ clinic.signature_data }}" alt="Signature" style="max-height:70px;max-width:180px" />
+        {% endif %}
+        <p><strong>{{ clinic.signatory if clinic and clinic.signatory else 'Dr. ' ~ doctor.doctor_name }}</strong></p>
         {% if doctor.qualifications %}<p>{{ doctor.qualifications }}</p>{% endif %}
         {% if doctor.kmc_number %}<p>KMC Reg. No: {{ doctor.kmc_number }}</p>{% endif %}
         <p>Endocrinologist</p>

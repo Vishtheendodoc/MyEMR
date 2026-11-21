@@ -40,9 +40,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    const refresh = localStorage.getItem('refresh_token');
+    if (refresh) api.logout(refresh).catch(() => {});
     clearTokens();
     setUser(null);
   };
+
+  useEffect(() => {
+    if (!user) return;
+    const limit = 20 * 60 * 1000;
+    let timer = window.setTimeout(logout, limit);
+    const bump = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(logout, limit);
+    };
+    const events = ['mousedown', 'keydown', 'touchstart'] as const;
+    events.forEach(name => window.addEventListener(name, bump));
+    return () => {
+      window.clearTimeout(timer);
+      events.forEach(name => window.removeEventListener(name, bump));
+    };
+  }, [user]);
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>

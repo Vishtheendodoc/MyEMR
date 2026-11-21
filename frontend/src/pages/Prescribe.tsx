@@ -1,6 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { api, Brand, DrugSearchResult, VisitDetail } from '../api/client';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { api, Brand, DrugSearchResult, PriceItem, VisitDetail } from '../api/client';
+import SuggestField from '../components/SuggestField';
+import { recallTyped, rememberTyped } from '../utils/typedMemory';
+import { formatClinicDate } from '../utils/clinicTime';
 
 const FREQUENCIES = [
   { value: 'OD', label: 'OD (Once Daily)' },
@@ -31,10 +34,58 @@ function suggestedDosage(brand: Brand | null, item?: DrugSearchResult): string {
   return brand.suggested_dosage || item?.suggested_dosage || brand.strength || item?.strength || '';
 }
 
+function FavoriteRx({ visitId, onAdded }: { visitId: number; onAdded: () => Promise<void> }) {
+  const [items, setItems] = useState<PriceItem[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState('');
+  useEffect(() => {
+    api.prices().then(rows => setItems(rows.filter(row => row.kind === 'favorite'))).catch(() => {});
+  }, []);
+  if (!items.length) return null;
+  return (
+    <div className="mb-3">
+      <label className="form-label">Favorite prescription</label>
+      <select className="form-select" value="" disabled={busy} onChange={async e => {
+        const item = items.find(row => String(row.id) === e.target.value);
+        if (!item) return;
+        const names = (item.detail || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+        setBusy(true);
+        setNote('');
+        try {
+          for (const name of names) {
+            await api.addPrescription(visitId, {
+              custom_drug_name: name,
+              frequency: 'OD',
+              duration: '30 days',
+              timing: '1-0-0',
+            });
+          }
+          setNote(`Added ${names.length} medicine${names.length === 1 ? '' : 's'} from ${item.name}.`);
+          await onAdded();
+        } catch (err) {
+          setNote(err instanceof Error ? err.message : 'Could not add the favorite set');
+        } finally {
+          setBusy(false);
+        }
+      }}>
+        <option value="">{busy ? 'Adding…' : 'Add a saved set…'}</option>
+        {items.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+      </select>
+      {note && <div className="form-text">{note}</div>}
+    </div>
+  );
+}
+
+const EMPTY_DRUG = {
+  custom_drug_name: '', custom_generic_name: '',
+  dosage: '', dose_morning: '', dose_afternoon: '', dose_evening: '',
+  frequency: 'OD', duration: '30 days', instructions: '',
+};
+
 export default function Prescribe() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const [visit, setVisit] = useState<VisitDetail | null>(null);
+  const [patientAlerts, setPatientAlerts] = useState<{ allergies?: string | null; problem_list?: string | null } | null>(null);
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<DrugSearchResult[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -46,14 +97,31 @@ export default function Prescribe() {
   const [night, setNight] = useState(false);
   const [mealTiming, setMealTiming] = useState('');
   const [bilingualPreview, setBilingualPreview] = useState('');
-  const [form, setForm] = useState({
-    custom_drug_name: '', custom_generic_name: '',
-    dosage: '', dose_morning: '', dose_afternoon: '', dose_evening: '',
-    frequency: 'OD', duration: '30 days', instructions: '',
-  });
+  const [form, setForm] = useState(EMPTY_DRUG);
+  const [addedName, setAddedName] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
   const [useCustom, setUseCustom] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [lastRx, setLastRx] = useState<{
+    source_visit_id: number | null;
+    visit_date: string | null;
+    prescriptions: {
+      id: number;
+      drug_name: string | null;
+      custom_drug_name: string | null;
+      brand_medication_id?: number | null;
+      formatted_dosage: string | null;
+      dosage: string | null;
+      frequency: string | null;
+      duration: string | null;
+      timing?: string | null;
+      instructions?: string | null;
+    }[];
+  } | null>(null);
+  const [repeating, setRepeating] = useState(false);
+  const [copyingId, setCopyingId] = useState<number | null>(null);
+  const [currentRx, setCurrentRx] = useState<VisitDetail['prescriptions']>([]);
 
   const timing = useMemo(() => buildTiming(morning, afternoon, night), [morning, afternoon, night]);
 
@@ -88,9 +156,73 @@ export default function Prescribe() {
     }
   }, []);
 
-  useEffect(() => {
-    if (id) api.visit(Number(id)).then(setVisit);
+  const reloadVisit = useCallback(async () => {
+    if (!id) return;
+    const v = await api.visit(Number(id));
+    setVisit(v);
+    setCurrentRx(v.prescriptions || []);
+    if (v.patient_id) {
+      api.lastPrescriptions(v.patient_id, v.id).then(setLastRx).catch(() => setLastRx(null));
+      api.patient(v.patient_id).then(p => setPatientAlerts({ allergies: p.allergies, problem_list: p.problem_list })).catch(() => {});
+    }
   }, [id]);
+
+  useEffect(() => {
+    reloadVisit().catch(() => {});
+  }, [reloadVisit]);
+
+  const repeatLastRx = async () => {
+    if (!id || !lastRx?.source_visit_id) return;
+    if (!confirm(`Copy ${lastRx.prescriptions.length} medication(s) from the previous visit into this prescription?`)) return;
+    setRepeating(true);
+    setError('');
+    try {
+      const res = await api.repeatPrescriptions(Number(id), lastRx.source_visit_id);
+      if (res.warnings?.length) setWarnings(res.warnings);
+      await reloadVisit();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to repeat prescriptions');
+    } finally {
+      setRepeating(false);
+    }
+  };
+
+  const copyOnePrior = async (rx: {
+    id: number;
+    drug_name: string | null;
+    custom_drug_name: string | null;
+    brand_medication_id?: number | null;
+    formatted_dosage: string | null;
+    dosage: string | null;
+    frequency: string | null;
+    duration: string | null;
+    timing?: string | null;
+    instructions?: string | null;
+  }) => {
+    if (!id) return;
+    setCopyingId(rx.id);
+    setError('');
+    try {
+      const hasBrand = Boolean(rx.brand_medication_id);
+      const payload: Record<string, unknown> = {
+        brand_id: hasBrand ? rx.brand_medication_id : undefined,
+        custom_drug_name: hasBrand ? undefined : (rx.custom_drug_name || rx.drug_name || undefined),
+        dosage: rx.dosage || rx.formatted_dosage || undefined,
+        frequency: rx.frequency || 'OD',
+        duration: rx.duration || '30 days',
+        timing: rx.timing || undefined,
+        instructions: rx.instructions || undefined,
+      };
+      const res = await api.addPrescription(Number(id), payload);
+      if (res.warnings?.length) setWarnings(res.warnings);
+      rememberTyped('drug', rx.drug_name || rx.custom_drug_name || '');
+      await reloadVisit();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to copy medicine');
+    } finally {
+      setCopyingId(null);
+    }
+  };
 
   useEffect(() => {
     if (search.length >= 2) api.searchDrugs(search).then(setResults);
@@ -99,7 +231,9 @@ export default function Prescribe() {
 
   const selectDrug = async (item: DrugSearchResult) => {
     setUseCustom(false);
-    setSearch(item.display_label || item.generic_name);
+    const label = item.display_label || item.generic_name;
+    setSearch(label);
+    rememberTyped('drug', label);
     setResults([]);
     const brandList = await api.getBrands(item.id);
     setBrands(brandList);
@@ -146,7 +280,28 @@ export default function Prescribe() {
           };
       const res = await api.addPrescription(Number(id), payload);
       if (res.warnings?.length) setWarnings(res.warnings);
-      navigate(`/visits/${id}`);
+      else setWarnings([]);
+      const name = useCustom ? form.custom_drug_name : (selectedBrand?.display_label || selectedBrand?.brand_name || search);
+      rememberTyped('drug', name);
+      setAddedName(name);
+      setSearch('');
+      setResults([]);
+      setBrands([]);
+      setSelectedBrand(null);
+      setIsInsulin(false);
+      setUseCustom(false);
+      setMealTiming('');
+      setBilingualPreview('');
+      setMorning(true);
+      setAfternoon(false);
+      setNight(false);
+      setForm(current => ({
+        ...EMPTY_DRUG,
+        frequency: current.frequency,
+        duration: current.duration,
+      }));
+      await reloadVisit();
+      searchRef.current?.focus();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add prescription');
     } finally {
@@ -167,14 +322,86 @@ export default function Prescribe() {
 
   return (
     <div>
-      <h2 className="mb-4">Prescribe — {visit.patient_name}</h2>
+      <div className="page-header">
+        <div>
+          <h2>Prescribe</h2>
+          <p className="page-subtitle">{visit.patient_name}</p>
+        </div>
+        {lastRx?.source_visit_id && lastRx.prescriptions.length > 0 && (
+          <button type="button" className="btn btn-outline-primary" disabled={repeating} onClick={repeatLastRx}>
+            <i className="fas fa-copy me-1"></i>
+            {repeating ? 'Copying…' : `Repeat last Rx (${lastRx.prescriptions.length})`}
+          </button>
+        )}
+      </div>
+      {patientAlerts && (patientAlerts.allergies?.trim() || patientAlerts.problem_list?.trim()) && (
+        <div className="alert alert-danger">
+          {patientAlerts.allergies?.trim() && <div><strong>Allergies:</strong> {patientAlerts.allergies}</div>}
+          {patientAlerts.problem_list?.trim() && <div><strong>Problem list:</strong> {patientAlerts.problem_list}</div>}
+        </div>
+      )}
       {error && <div className="alert alert-danger">{error}</div>}
       {warnings.length > 0 && (
         <div className="alert alert-warning">
           <strong>Clinical alerts:</strong>
           <ul className="mb-0 mt-1">
-            {(warnings as { message?: string }[]).map((w, i) => (
-              <li key={i}>{w.message || String(w)}</li>
+            {(warnings as { message?: string; recommendation?: string }[]).map((w, i) => (
+              <li key={i}>{w.message || w.recommendation || String(w)}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {lastRx?.source_visit_id && lastRx.prescriptions.length > 0 && (
+        <div className="card mb-3 p-3">
+          <div className="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+            <div>
+              <h6 className="mb-1"><i className="fas fa-history me-1"></i>Previous prescription</h6>
+              <div className="small text-muted">
+                From {lastRx.visit_date ? formatClinicDate(lastRx.visit_date) : 'prior visit'}
+              </div>
+            </div>
+            <button type="button" className="btn btn-sm btn-primary" disabled={repeating} onClick={repeatLastRx}>
+              Carry forward all
+            </button>
+          </div>
+          <div className="table-responsive mt-2">
+            <table className="table table-sm mb-0 align-middle">
+              <tbody>
+                {lastRx.prescriptions.map(rx => (
+                  <tr key={rx.id}>
+                    <td>
+                      <strong>{rx.drug_name || rx.custom_drug_name || 'Medication'}</strong>
+                      <div className="small text-muted">
+                        {[rx.formatted_dosage || rx.dosage, rx.frequency, rx.duration].filter(Boolean).join(' · ')}
+                      </div>
+                    </td>
+                    <td className="text-end text-nowrap">
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-primary"
+                        disabled={copyingId === rx.id || repeating}
+                        onClick={() => copyOnePrior(rx)}
+                      >
+                        {copyingId === rx.id ? 'Adding…' : 'Copy'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      {currentRx.length > 0 && (
+        <div className="card mb-3 p-3">
+          <h6 className="mb-2">On this visit</h6>
+          <ul className="mb-0 small">
+            {currentRx.map(rx => (
+              <li key={rx.id}>
+                <strong>{rx.drug_name || rx.custom_drug_name || 'Medication'}</strong>
+                {' · '}
+                {[rx.formatted_dosage || rx.dosage, rx.frequency, rx.duration].filter(Boolean).join(' · ')}
+              </li>
             ))}
           </ul>
         </div>
@@ -191,8 +418,13 @@ export default function Prescribe() {
             <div className="row mb-3">
               <div className="col-md-6">
                 <label className="form-label">Drug Name *</label>
-                <input className="form-control" required value={form.custom_drug_name}
-                  onChange={e => setForm({ ...form, custom_drug_name: e.target.value })} />
+                <SuggestField
+                  field="drug"
+                  required
+                  value={form.custom_drug_name}
+                  onChange={v => setForm({ ...form, custom_drug_name: v })}
+                  placeholder="Type to recall prior medicines"
+                />
               </div>
               <div className="col-md-6">
                 <label className="form-label">Generic Name</label>
@@ -202,11 +434,35 @@ export default function Prescribe() {
             </div>
           ) : (
             <div className="mb-3 position-relative">
+              {id && <FavoriteRx visitId={Number(id)} onAdded={reloadVisit} />}
               <label className="form-label">Search Drug</label>
-              <input className="form-control" value={search} placeholder="Type 2+ characters..."
-                onChange={e => setSearch(e.target.value)} />
-              {results.length > 0 && (
+              <input ref={searchRef} className="form-control" value={search} placeholder="Type 2+ characters..."
+                onChange={e => { setSearch(e.target.value); if (e.target.value) setAddedName(''); }} />
+              {(results.length > 0 || (search.trim().length >= 1 && recallTyped('drug', search).length > 0)) && (
                 <div className="list-group search-results mt-1">
+                  {recallTyped('drug', search)
+                    .filter(name => !results.some(r =>
+                      (r.display_label || r.generic_name || '').toLowerCase() === name.toLowerCase()))
+                    .slice(0, 5)
+                    .map(name => (
+                      <button
+                        type="button"
+                        key={`recent-${name}`}
+                        className="list-group-item list-group-item-action"
+                        onClick={() => {
+                          setUseCustom(true);
+                          setSearch(name);
+                          setResults([]);
+                          setSelectedBrand(null);
+                          setBrands([]);
+                          setForm(f => ({ ...f, custom_drug_name: name }));
+                          rememberTyped('drug', name);
+                        }}
+                      >
+                        {name}
+                        <span className="text-muted small ms-2">recent</span>
+                      </button>
+                    ))}
                   {results.map((r, i) => (
                     <button type="button" key={i} className="list-group-item list-group-item-action"
                       onClick={() => selectDrug(r)}>
@@ -327,10 +583,15 @@ export default function Prescribe() {
             </div>
           </div>
 
+          {addedName && (
+            <div className="alert alert-success py-2">
+              Added <strong>{addedName}</strong>. Search the next medicine, or choose Done when the list is complete.
+            </div>
+          )}
           <button type="submit" className="btn btn-primary me-2" disabled={loading}>
             {loading ? 'Adding...' : 'Add Prescription'}
           </button>
-          <Link to={`/visits/${id}`} className="btn btn-outline-secondary">Cancel</Link>
+          <Link to={`/visits/${id}`} className="btn btn-outline-secondary">Done</Link>
         </form>
       </div>
     </div>

@@ -19,6 +19,7 @@ class VisitCreate(BaseModel):
     examination: str | None = None
     diagnosis: str | None = None
     investigation: str | None = None
+    ordered_investigations: str | None = None
     comorbidities: str | None = None
     follow_up_date: date | None = None
     follow_up_notes: str | None = None
@@ -57,6 +58,7 @@ class VisitResponse(BaseModel):
     examination: str | None
     diagnosis: str | None
     investigation: str | None
+    ordered_investigations: str | None = None
     comorbidities: str | None
     follow_up_date: date | None
     follow_up_notes: str | None
@@ -74,6 +76,8 @@ class VisitResponse(BaseModel):
     doctor_id: int | None
     patient_name: str | None = None
     patient_mrd: str | None = None
+    patient_allergies: str | None = None
+    patient_problem_list: str | None = None
 
     model_config = {"from_attributes": True}
 
