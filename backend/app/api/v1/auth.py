@@ -45,8 +45,25 @@ def _next_clinic_id(db: Session) -> int:
     return max(int(user_max), int(profile_max)) + 1
 
 
+def _optional_user(request: Request, db: Session) -> User | None:
+    header = request.headers.get("authorization", "")
+    if not header.lower().startswith("bearer "):
+        return None
+    payload = decode_token(header[7:].strip())
+    if not payload or payload.get("type") != "access" or not payload.get("sub"):
+        return None
+    user = db.get(User, int(payload["sub"]))
+    return user if user and getattr(user, "is_active", True) is not False else None
+
+
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def register(data: RegisterRequest, db: Session = Depends(get_db)):
+def register(data: RegisterRequest, request: Request, db: Session = Depends(get_db)):
+    # A doctor account can see every chart in its clinic, so nobody anonymous may create one
+    # unless this is the very first doctor or public registration was switched on.
+    doctor_exists = db.query(User).filter(User.role == "doctor").first() is not None
+    caller = _optional_user(request, db)
+    if doctor_exists and not settings.allow_public_registration and not (caller and caller.role in ("doctor", "admin")):
+        raise HTTPException(status_code=403, detail="Sign in as a doctor to add another doctor account")
     email = normalize_email(data.email)
     if db.query(User).filter(func.lower(User.email) == email).first():
         raise HTTPException(status_code=400, detail="An account with this email already exists")
@@ -94,7 +111,8 @@ def _issue_tokens(db: Session, user: User) -> TokenResponse:
 
 @router.post("/login", response_model=TokenResponse)
 def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
-    if not allow_login(data.email or request.client.host if request.client else "unknown"):
+    client_ip = request.client.host if request.client else "unknown"
+    if not allow_login(f"{client_ip}|{(data.email or '').strip().lower()}"):
         raise HTTPException(status_code=429, detail="Too many login attempts. Wait a minute and try again.")
     email = normalize_email(data.email)
     user = db.query(User).filter(func.lower(User.email) == email).first()
@@ -114,7 +132,7 @@ def refresh(data: RefreshRequest, db: Session = Depends(get_db)):
     if not session or session.revoked_at is not None or session.expires_at < datetime.utcnow():
         raise HTTPException(status_code=401, detail="Invalid refresh token")
     user = db.get(User, int(payload["sub"]))
-    if not user or user.id != session.user_id:
+    if not user or user.id != session.user_id or getattr(user, "is_active", True) is False:
         raise HTTPException(status_code=401, detail="User not found")
     session.revoked_at = datetime.utcnow()
     replacement = new_refresh_jti()

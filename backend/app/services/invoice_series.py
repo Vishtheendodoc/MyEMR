@@ -9,7 +9,7 @@ from decimal import Decimal, ROUND_HALF_UP
 
 from sqlalchemy.orm import Session
 
-from app.models import Bill, Patient, PurchaseReturn, SalesReturn, TaxNote
+from app.models import Bill, Patient, PurchaseInvoice, PurchaseReturn, SalesReturn, TaxNote
 from app.services.clinic_time import clinic_wall_now
 
 STATE_CODES = {
@@ -108,6 +108,13 @@ def next_document_number(db: Session, clinic_id: int, kind: str) -> str:
             row[0]
             for row in db.query(TaxNote.document_no).filter(
                 TaxNote.clinic_id == clinic_id, TaxNote.kind == "debit", TaxNote.document_no.like(f"{prefix}%")
+            ).all()
+        ]
+    elif kind == "PUR":
+        numbers = [
+            row[0]
+            for row in db.query(PurchaseInvoice.document_no).filter(
+                PurchaseInvoice.clinic_id == clinic_id, PurchaseInvoice.document_no.like(f"{prefix}%")
             ).all()
         ]
     elif kind == "PR":

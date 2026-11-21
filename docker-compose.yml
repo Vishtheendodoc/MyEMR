@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: emr_secret
       POSTGRES_DB: endo_emr
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -21,7 +21,7 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql://emr:emr_secret@db:5432/endo_emr
-      JWT_SECRET: change-me-in-production-use-long-random-string
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-long-random-string}
       CORS_ORIGINS: http://localhost:5173,http://localhost:3000
       SEED_ON_STARTUP: "true"
     volumes:

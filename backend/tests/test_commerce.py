@@ -477,7 +477,7 @@ def test_a_new_doctor_gets_a_separate_setup_and_a_desk_can_switch():
     assert existing.status_code == 200, existing.text
     stamp = datetime.utcnow().strftime("%H%M%S%f")
     email = f"newdoc{stamp}@clinic.com"
-    created = client.post("/api/v1/auth/register", json={
+    created = client.post("/api/v1/auth/register", headers=_login(), json={
         "email": email,
         "password": "password123",
         "display_name": "Separate Doctor",
@@ -519,7 +519,7 @@ def test_a_new_doctor_gets_a_separate_setup_and_a_desk_can_switch():
 def test_registration_files_a_patient_under_the_chosen_doctor():
     stamp = datetime.utcnow().strftime("%H%M%S%f")
     email = f"chosendoc{stamp}@clinic.com"
-    created = client.post("/api/v1/auth/register", json={
+    created = client.post("/api/v1/auth/register", headers=_login(), json={
         "email": email,
         "password": "password123",
         "display_name": "Chosen Doctor",
@@ -558,13 +558,13 @@ def test_registration_files_a_patient_under_the_chosen_doctor():
 
 def test_registration_search_sees_every_doctor_and_can_assign_one():
     stamp = datetime.utcnow().strftime("%H%M%S%f")
-    first = client.post("/api/v1/auth/register", json={
+    first = client.post("/api/v1/auth/register", headers=_login(), json={
         "email": f"searchdoc{stamp}@clinic.com",
         "password": "password123",
         "display_name": "Search Doctor",
     })
     assert first.status_code == 201, first.text
-    second = client.post("/api/v1/auth/register", json={
+    second = client.post("/api/v1/auth/register", headers=_login(), json={
         "email": f"assigndoc{stamp}@clinic.com",
         "password": "password123",
         "display_name": "Assign Doctor",

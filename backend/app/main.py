@@ -42,6 +42,10 @@ async def _reminder_scheduler():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    if settings.uses_default_jwt_secret:
+        if settings.is_production:
+            raise RuntimeError("JWT_SECRET is still the placeholder value. Set a long random secret before starting in production.")
+        logger.warning("JWT_SECRET is the placeholder value. Fine on one local PC, never on a shared or online server.")
     Base.metadata.create_all(bind=engine)
     ensure_phase2_columns()
     db = SessionLocal()
@@ -53,7 +57,14 @@ async def lifespan(app: FastAPI):
         db.rollback()
     finally:
         db.close()
-    if settings.seed_on_startup:
+    if settings.is_production:
+        # No demo doctor and no shared-password desk accounts on a live server.
+        db = SessionLocal()
+        try:
+            seed_platform(db)
+        finally:
+            db.close()
+    elif settings.seed_on_startup:
         db = SessionLocal()
         try:
             seed_if_empty(db)
@@ -83,6 +94,9 @@ app = FastAPI(
     title="Endocrinology EMR API",
     version="1.0.0",
     lifespan=lifespan,
+    docs_url=None if settings.is_production else "/docs",
+    redoc_url=None if settings.is_production else "/redoc",
+    openapi_url=None if settings.is_production else "/openapi.json",
 )
 
 app.add_middleware(
